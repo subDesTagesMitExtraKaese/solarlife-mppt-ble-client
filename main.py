@@ -5,23 +5,15 @@ import asyncio
 import signal
 import json
 
-import paho.mqtt.client as mqtt
+import aiomqtt
 from bleak.exc import BleakError, BleakDeviceNotFoundError
 
 from bleclient import BleClient
 
-client = mqtt.Client()
 send_config = True
+reconnect_interval = 5  # In seconds
 
-def details_handler(details):
-    if details:
-        print(f"Battery: {details['battery_percentage']}% ({details['battery_voltage']}V)")
-        mqtt_publish(details, client)
-    else:
-        print("No values recieved")
-
-
-def mqtt_publish(details, client):
+async def mqtt_publish(details: dict[str, any], client: aiomqtt.Client):
     global send_config
     # Define the base topic for MQTT Discovery
     base_topic = "homeassistant"
@@ -70,47 +62,43 @@ def mqtt_publish(details, client):
 
         # Publish the MQTT Discovery payload
         if send_config:
-            client.publish(topic, payload=json.dumps(payload), retain=True)
+            print(f"Publishing MQTT Discovery payload for {key}")
+            await client.publish(topic, payload=json.dumps(payload), retain=True)
 
         # Publish the entity state
-        client.publish(state_topic, payload=str(value))
+        await client.publish(state_topic, payload=str(value))
     send_config = False
     
 async def main(address, host, port, username, password):
-    client.username_pw_set(username, password)  # Set MQTT username and password
-
     async def run_mppt():
         while True:
             try:
-                client.connect(host, port)  # Connect to the MQTT broker
-                break  # Connection successful, exit the loop
-
-            except asyncio.CancelledError:
-                raise  # Re-raise the CancelledError to stop the task
-            except Exception as e:
-                print(f"An error occurred while connecting to MQTT broker: {e}")
-                await asyncio.sleep(5)  # Wait for 5 seconds before retrying
-
-        while True:
-            try:
-                async with BleClient(address) as mppt:
-                    mppt.on_details_received = details_handler
-                    await mppt.request_details()
-
+                async with aiomqtt.Client(hostname=host, port=port, username=username, password=password) as client:
+                    print(f"Connecting to MQTT broker at {host}:{port}")
+                    async def details_handler(details: dict[str, any]):
+                        if details:
+                            print(f"Battery: {details['battery_percentage']}% ({details['battery_voltage']}V)")
+                            await mqtt_publish(details, client)
+                        else:
+                            print("No values recieved")
                     while True:
-                        await asyncio.sleep(20.0)
                         try:
-                            await mppt.request_details()
+                            async with BleClient(address) as mppt:
+                                mppt.on_details_received = details_handler
+                                while True:
+                                    await mppt.request_details()
+                                    await asyncio.sleep(20.0)
+
+                        except BleakDeviceNotFoundError:
+                            print(f"BLE device with address {address} was not found")
+                            await asyncio.sleep(5)  # Wait for 5 seconds before retrying
                         except BleakError as e:
                             print(f"BLE error occurred: {e}")
-                            # Handle the BLE error accordingly, e.g., reconnect or terminate the task
-                            break
-
+            except aiomqtt.MqttError as error:
+                print(f'Error "{error}". Reconnecting in {reconnect_interval} seconds.')
+                await asyncio.sleep(reconnect_interval)
             except asyncio.CancelledError:
                 raise  # Re-raise the CancelledError to stop the task
-            except BleakDeviceNotFoundError:
-                print(f"BLE device with address {address} was not found")
-                await asyncio.sleep(5)  # Wait for 5 seconds before retrying
             except Exception as e:
                 print(f"An error occurred during BLE communication: {e}")
                 await asyncio.sleep(5)  # Wait for 5 seconds before retrying

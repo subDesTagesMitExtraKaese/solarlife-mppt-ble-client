@@ -36,7 +36,7 @@ class BleClient:
         #print("write ", self.WRITE_UUID, data.hex())
         await self.client.write_gatt_char(self.WRITE_UUID, data)  # Write the data to the BLE device
 
-    def notification_handler(self, characteristic: BleakGATTCharacteristic, data: bytearray):
+    async def notification_handler(self, characteristic: BleakGATTCharacteristic, data: bytearray):
         if characteristic.uuid != self.NOTIFY_UUID:
             return
         self.buffer += data  # Append the received data to the buffer
@@ -55,7 +55,7 @@ class BleClient:
             return
         if len(self.buffer) == 91:
             response = BleClient.parse_details_response(self.buffer)  # Parse the details response from the buffer
-            self.on_details_received(response)  # Call the callback function with the parsed response
+            await self.on_details_received(response)  # Call the callback function with the parsed response
             self.buffer = bytearray()
         if len(self.buffer) >= 91:
             print(f"received too many bytes ({len(self.buffer)})")

@@ -10,7 +10,7 @@ The application establishes a connection to the MQTT broker and the BLE device, 
 
 - Python 3.7+
 - [Bleak](https://github.com/hbldh/bleak) - A BLE library for Python
-- [Paho MQTT](https://github.com/eclipse/paho.mqtt.python) - A MQTT library for Python
+- [aiomqtt](https://github.com/sbtinstruments/aiomqtt) - A MQTT library for Python
 
 ## Installation
 
