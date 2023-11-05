@@ -14,7 +14,7 @@ class BleClient:
 
     def __init__(self, mac_address: str):
         self.client = BleakClient(mac_address)
-        self.on_details_received = lambda v: print(v)  # Callback function to handle received details
+        self.details_queue = asyncio.Queue()  # Queue to store the received details
 
     async def __aenter__(self):
         await self.client.connect()  # Connect to the BLE device
@@ -55,7 +55,7 @@ class BleClient:
             return
         if len(self.buffer) == 91:
             response = BleClient.parse_details_response(self.buffer)  # Parse the details response from the buffer
-            await self.on_details_received(response)  # Call the callback function with the parsed response
+            self.details_queue.put_nowait(response)  # Add the parsed response to the queue
             self.buffer = bytearray()
         if len(self.buffer) >= 91:
             print(f"received too many bytes ({len(self.buffer)})")
@@ -78,7 +78,13 @@ class BleClient:
         return "".join(map(chr, device_name))
 
     async def request_details(self):
-        await self.write(0xFE043030002bbf1a)  # Send a request for details to the BLE device
+        self.details_queue = asyncio.Queue()  # Clear the queue
+        i = 0
+        while self.details_queue.empty() and i < 10:
+            i += 1
+            await self.write(0xFE043030002bbf1a)  # Send a request for details to the BLE device
+            await asyncio.sleep(0.1)  # Wait for the response to be received
+        return await self.details_queue.get()  # Return the first item in the queue
 
     @staticmethod
     def solar_panel_charge_state(v: int):

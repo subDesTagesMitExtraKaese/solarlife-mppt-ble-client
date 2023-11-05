@@ -75,18 +75,16 @@ async def main(address, host, port, username, password):
             try:
                 async with aiomqtt.Client(hostname=host, port=port, username=username, password=password) as client:
                     print(f"Connecting to MQTT broker at {host}:{port}")
-                    async def details_handler(details: dict[str, any]):
-                        if details:
-                            print(f"Battery: {details['battery_percentage']}% ({details['battery_voltage']}V)")
-                            await mqtt_publish(details, client)
-                        else:
-                            print("No values recieved")
                     while True:
                         try:
                             async with BleClient(address) as mppt:
-                                mppt.on_details_received = details_handler
                                 while True:
-                                    await mppt.request_details()
+                                    details = await mppt.request_details()
+                                    if details:
+                                        print(f"Battery: {details['battery_percentage']}% ({details['battery_voltage']}V)")
+                                        await mqtt_publish(details, client)
+                                    else:
+                                        print("No values recieved")
                                     await asyncio.sleep(20.0)
 
                         except BleakDeviceNotFoundError:
