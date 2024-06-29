@@ -1,2 +1,2 @@
-aiomqtt==1.2.1
+aiomqtt==2.1.0
 bleak==0.22.2
