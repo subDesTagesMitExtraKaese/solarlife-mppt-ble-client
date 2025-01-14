@@ -83,8 +83,12 @@ class BleClient:
         while self.details_queue.empty() and i < 10:
             i += 1
             await self.write(0xFE043030002bbf1a)  # Send a request for details to the BLE device
-            await asyncio.sleep(0.1)  # Wait for the response to be received
-        return await self.details_queue.get()  # Return the first item in the queue
+            try:
+                # Wait for either a response or timeout
+                return await asyncio.wait_for(self.details_queue.get(), timeout=5)
+            except asyncio.TimeoutError:
+                pass
+        return None
 
     @staticmethod
     def solar_panel_charge_state(v: int):
