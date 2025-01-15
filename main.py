@@ -89,9 +89,10 @@ async def main(address, host, port, username, password):
 
                         except BleakDeviceNotFoundError:
                             print(f"BLE device with address {address} was not found")
-                            await asyncio.sleep(5)  # Wait for 5 seconds before retrying
+                            await asyncio.sleep(5)
                         except BleakError as e:
                             print(f"BLE error occurred: {e}")
+                            await asyncio.sleep(5)
             except aiomqtt.MqttError as error:
                 print(f'Error "{error}". Reconnecting in {reconnect_interval} seconds.')
                 await asyncio.sleep(reconnect_interval)
