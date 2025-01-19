@@ -47,5 +47,14 @@ class TestParser(unittest.TestCase):
         ]
         for name in bad_names:
             self.assertNotIn(name, [v.name for v in self.parser.variables], f"variable {name} still exists")
+
+    def test_multiplier_func_exclusion(self):
+        for variable in self.parser.variables:
+            if variable.multiplier:
+                self.assertIsNone(variable.func)
+    def test_func_32_bit_exclusion(self):
+        for variable in self.parser.variables:
+            if variable.is_32_bit:
+                self.assertIsNone(variable.func)
 if __name__ == "__main__":
     unittest.main()
