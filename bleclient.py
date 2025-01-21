@@ -145,7 +145,7 @@ class BleClient:
             "battery_percentage": struct.unpack_from(">H", subdata, 42)[0],
             "battery_voltage": struct.unpack_from(">H", subdata, 44)[0] / 100,
             "battery_current": struct.unpack_from(">h", subdata, 46)[0] / 100,
-            "battery_power": (struct.unpack_from(">H", subdata, 48)[0] + struct.unpack_from(">h", subdata, 50)[0]  * 0x100) / 100,
+            "battery_power": (struct.unpack_from(">H", subdata, 48)[0] | struct.unpack_from(">h", subdata, 50)[0] << 16) / 100,
             "load_voltage": struct.unpack_from(">H", subdata, 52)[0] / 100,
             "load_current": struct.unpack_from(">H", subdata, 54)[0] / 100,
             "load_power": (struct.unpack_from(">H", subdata, 56)[0] | struct.unpack_from(">H", subdata, 58)[0] << 16) / 100,
@@ -155,7 +155,7 @@ class BleClient:
             "solar_panel_daily_energy": struct.unpack_from(">H", subdata, 68)[0] / 100,
             "solar_panel_total_energy": (struct.unpack_from(">H", subdata, 70)[0] | struct.unpack_from(">H", subdata, 72)[0] << 16) / 100,
             "load_daily_energy": struct.unpack_from(">H", subdata, 74)[0] / 100,
-            "load_total_energy": struct.unpack_from(">I", subdata, 78)[0] / 100,
+            "load_total_energy": (struct.unpack_from(">H", subdata, 76)[0] | struct.unpack_from(">H", subdata, 78)[0] << 16 ) / 100,
         }
 
     # Map the keys to their respective units of measurement
