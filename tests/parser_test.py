@@ -1,12 +1,14 @@
+from itertools import groupby
+
 import unittest
 import sys
 sys.path.append("..")
 
-from src.parser import ModbusParser
+from src.protocol import LumiaxClient
 
 class TestParser(unittest.TestCase):
     def setUp(self):
-        self.parser = ModbusParser()
+        self.parser = LumiaxClient()
 
     def test_includes_names(self):
         names = [
@@ -56,5 +58,10 @@ class TestParser(unittest.TestCase):
         for variable in self.parser.variables:
             if variable.is_32_bit:
                 self.assertIsNone(variable.func)
+    def test_common_lengths(self):
+        for key, group in groupby(self.parser.variables, lambda x: x.address):
+            is_32_bit = next(group).is_32_bit
+            for variable in group:
+                self.assertEqual(variable.is_32_bit, is_32_bit)
 if __name__ == "__main__":
     unittest.main()
