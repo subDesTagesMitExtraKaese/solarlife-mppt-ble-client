@@ -4,12 +4,9 @@ import unittest
 import sys
 sys.path.append("..")
 
-from src.protocol import LumiaxClient
+from src.variables import variables
 
-class TestParser(unittest.TestCase):
-    def setUp(self):
-        self.parser = LumiaxClient()
-
+class TestCompat(unittest.TestCase):
     def test_includes_names(self):
         names = [
             "equipment_id",
@@ -37,7 +34,7 @@ class TestParser(unittest.TestCase):
             "load_total_energy",
         ]
         for name in names:
-            self.assertIn(name, [v.name for v in self.parser.variables], f"variable {name} doesn't exist anymore")
+            self.assertIn(name, [v.name for v in variables], f"variable {name} doesn't exist anymore")
     def test_excludes_names(self):
         bad_names = [
             "battery_full_level",
@@ -48,20 +45,26 @@ class TestParser(unittest.TestCase):
             "temperature_2",
         ]
         for name in bad_names:
-            self.assertNotIn(name, [v.name for v in self.parser.variables], f"variable {name} still exists")
+            self.assertNotIn(name, [v.name for v in variables], f"variable {name} still exists")
 
-    def test_multiplier_func_exclusion(self):
-        for variable in self.parser.variables:
-            if variable.multiplier:
-                self.assertIsNone(variable.func)
-    def test_func_32_bit_exclusion(self):
-        for variable in self.parser.variables:
-            if variable.is_32_bit:
-                self.assertIsNone(variable.func)
-    def test_common_lengths(self):
-        for key, group in groupby(self.parser.variables, lambda x: x.address):
-            is_32_bit = next(group).is_32_bit
-            for variable in group:
-                self.assertEqual(variable.is_32_bit, is_32_bit)
-if __name__ == "__main__":
-    unittest.main()
+    def test_units(self):
+        unit_mapping = {
+            "battery_percentage": "%",
+            "battery_voltage": "V",
+            "battery_current": "A",
+            "battery_power": "W",
+            "load_voltage": "V",
+            "load_current": "A",
+            "load_power": "W",
+            "solar_panel_voltage": "V",
+            "solar_panel_current": "A",
+            "solar_panel_power": "W",
+            "solar_panel_daily_energy": "kWh",
+            "solar_panel_total_energy": "kWh",
+            "load_daily_energy": "kWh",
+            "load_total_energy": "kWh",
+        }
+        for name, unit in unit_mapping.items():
+            items = [v for v in variables if name == v.name]
+            self.assertTrue(items, f"variable {name} doesn't exist anymore")
+            self.assertEqual(items[0].unit, unit)
