@@ -129,10 +129,19 @@ class LumiaxClient:
         result = header + bytes(data)
         return result + crc16(result)
 
-
-
-    def parse(self, start_address: int, buffer: bytes) -> list[(Variable, Value)]:
+    def is_complete(self, buffer: bytes) -> bool:
+        if len(buffer) < 4:
+            return False
         device_id = buffer[0]
+        function_code = FunctionCodes(buffer[1])
+        if function_code in [FunctionCodes.READ_MEMORY, FunctionCodes.READ_PARAMETER, FunctionCodes.READ_STATUS_REGISTER]:
+            data_length = buffer[2]
+            return len(buffer) >= data_length + 5
+        else:
+            return len(buffer) >= 8
+
+    def parse(self, start_address: int, buffer: bytes) -> list[Result]:
+        self.device_id = buffer[0]
         function_code = FunctionCodes(buffer[1])
         if function_code in [FunctionCodes.READ_MEMORY, FunctionCodes.READ_PARAMETER, FunctionCodes.READ_STATUS_REGISTER]:
             data_length = buffer[2]
