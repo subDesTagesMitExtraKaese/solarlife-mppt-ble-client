@@ -9,12 +9,12 @@ import aiomqtt
 from bleak import BleakScanner
 from bleak.exc import BleakError, BleakDeviceNotFoundError
 
-from src.bleclient import BleClient
+from src.bleclient import BleClient, Result
 
 send_config = True
 reconnect_interval = 5  # In seconds
 
-async def mqtt_publish(details: dict[str, any], client: aiomqtt.Client):
+async def mqtt_publish(details: dict[str, Result], client: aiomqtt.Client):
     global send_config
     # Define the base topic for MQTT Discovery
     base_topic = "homeassistant"
@@ -33,11 +33,11 @@ async def mqtt_publish(details: dict[str, any], client: aiomqtt.Client):
 
         # Create the MQTT Discovery payload
         payload = {
-            "name": f"Solarlife {key.replace('_', ' ').title()}",
+            "name": f"Solarlife {value.friendly_name}",
             "device": device_info,
             "unique_id": f"solarlife_{key}",
             "state_topic": state_topic,
-            "unit_of_measurement": BleClient.get_unit_of_measurement(key)
+            "unit_of_measurement": value.unit,
         }
         if "daily_energy" in key:
             payload['device_class'] = "energy"
@@ -67,7 +67,7 @@ async def mqtt_publish(details: dict[str, any], client: aiomqtt.Client):
             await client.publish(topic, payload=json.dumps(payload), retain=True)
 
         # Publish the entity state
-        await client.publish(state_topic, payload=str(value))
+        await client.publish(state_topic, payload=str(value.value))
     send_config = False
     
 async def main(address, host, port, username, password):
@@ -82,7 +82,7 @@ async def main(address, host, port, username, password):
                                 while True:
                                     details = await mppt.request_details()
                                     if details:
-                                        print(f"Battery: {details['battery_percentage']}% ({details['battery_voltage']}V)")
+                                        print(f"Battery: {details['battery_percentage'].value}% ({details['battery_voltage'].value}V)")
                                         await mqtt_publish(details, client)
                                     else:
                                         print("No values recieved")
