@@ -26,11 +26,11 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(len(recv_buf) - 5, byte_count)
 
         results = self.client.parse(start_address, recv_buf)
-        for variable, value in results:
-            self.assertIsNotNone(value, f"{variable.name} ({hex(variable.address)})")
+        for result in results:
+            self.assertIsNotNone(result.value, f"{result.name} ({hex(result.address)})")
         self.assertGreaterEqual(len(results), byte_count / 2)
-        self.assertEqual(hex(results[0][0].address), hex(start_address))
-        self.assertEqual(hex(results[-1][0].address), hex(end_address))
+        self.assertEqual(hex(results[0].address), hex(start_address))
+        self.assertEqual(hex(results[-1].address), hex(end_address))
 
     def test_2(self):
         device_id = 0x01
@@ -48,12 +48,12 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(len(recv_buf) - 5, byte_count)
 
         results = self.client.parse(start_address, recv_buf)
-        for variable, value in results:
-            self.assertIsNotNone(value, f"{variable.name} ({hex(variable.address)})")
+        for result in results:
+            self.assertIsNotNone(result.value, f"{result.name} ({hex(result.address)})")
         self.assertGreaterEqual(len(results), byte_count / 2)
-        self.assertEqual(hex(results[0][0].address), hex(start_address))
-        self.assertEqual(results[-1][0].is_32_bit, True)
-        self.assertEqual(hex(results[-1][0].address), hex(end_address-1))
+        self.assertEqual(hex(results[0].address), hex(start_address))
+        self.assertEqual(results[-1].is_32_bit, True)
+        self.assertEqual(hex(results[-1].address), hex(end_address-1))
 
     def test_3(self):
         device_id = 0x01
@@ -71,12 +71,12 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(len(recv_buf) - 5, byte_count)
 
         results = self.client.parse(start_address, recv_buf)
-        for variable, value in results:
-            self.assertIsNotNone(value, f"{variable.name} ({hex(variable.address)})")
+        for result in results:
+            self.assertIsNotNone(result.value, f"{result.name} ({hex(result.address)})")
         self.assertGreaterEqual(len(results), byte_count / 2)
-        self.assertEqual(hex(results[0][0].address), hex(start_address))
-        self.assertEqual(hex(results[-1][0].address), hex(end_address))
-        self.assertEqual(results[0][1], 60.0)
+        self.assertEqual(hex(results[0].address), hex(start_address))
+        self.assertEqual(hex(results[-1].address), hex(end_address))
+        self.assertEqual(results[0].value, 60.0)
 
     def test_4(self):
         device_id = 0x01
@@ -94,10 +94,10 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(len(recv_buf) - 5, byte_count)
 
         results = self.client.parse(start_address, recv_buf)
-        for variable, value in results:
-            self.assertIsNotNone(value, f"{variable.name} ({hex(variable.address)})")
-        self.assertEqual(hex(results[0][0].address), hex(start_address))
-        self.assertEqual(hex(results[-1][0].address), hex(end_address))
+        for result in results:
+            self.assertIsNotNone(result.value, f"{result.name} ({hex(result.address)})")
+        self.assertEqual(hex(results[0].address), hex(start_address))
+        self.assertEqual(hex(results[-1].address), hex(end_address))
 
     def test_5(self):
         device_id = 0x01
@@ -115,11 +115,11 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(len(recv_buf) - 5, byte_count)
 
         results = self.client.parse(start_address, recv_buf)
-        for variable, value in results:
-            self.assertIsNotNone(value, f"{variable.name} ({hex(variable.address)})")
+        for result in results:
+            self.assertIsNotNone(result.value, f"{result.name} ({hex(result.address)})")
         self.assertGreaterEqual(len(results), byte_count / 2)
-        self.assertEqual(hex(results[0][0].address), hex(start_address))
-        self.assertEqual(hex(results[-1][0].address), hex(end_address))
+        self.assertEqual(hex(results[0].address), hex(start_address))
+        self.assertEqual(hex(results[-1].address), hex(end_address))
 
     def test_6(self):
         device_id = 0x01

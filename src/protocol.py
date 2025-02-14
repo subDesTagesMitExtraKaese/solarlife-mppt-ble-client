@@ -1,4 +1,5 @@
 import struct
+from dataclasses import dataclass
 from typing import Any
 
 from .variables import variables, Variable, FunctionCodes
@@ -6,9 +7,13 @@ from .crc import crc16
 
 type Value = str|int|float
 
+@dataclass
+class Result(Variable):
+    value: Value
+
 class LumiaxClient:
     def __init__(self):
-        pass
+        self.device_id = 0xFE
 
     def bytes_to_value(self, variable: Variable, buffer: bytes, offset: int) -> Value:
         if variable.is_32_bit and variable.is_signed:
@@ -157,7 +162,7 @@ class LumiaxClient:
                 items = [v for v in variables if address == v.address and function_code.value in v.function_codes]
                 for variable in items:
                     value = self.bytes_to_value(variable, buffer, cursor)
-                    results.append((variable, value))
+                    results.append(Result(**vars(variable), value=value))
                 cursor += 2
                 address += 1
 
