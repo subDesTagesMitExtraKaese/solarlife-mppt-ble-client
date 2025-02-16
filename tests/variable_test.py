@@ -21,6 +21,11 @@ class TestVariables(unittest.TestCase):
             is_32_bit = next(group).is_32_bit
             for variable in group:
                 self.assertEqual(variable.is_32_bit, is_32_bit)
+    def test_overlap(self):
+        for variable in variables:
+            if variable.is_32_bit:
+                vs = [v for v in variables if v.address == variable.address + 1]
+                self.assertEqual([], vs)
     def test_indexer(self):
         variable = variables['battery_percentage']
         self.assertEqual('battery_percentage', variable.name)

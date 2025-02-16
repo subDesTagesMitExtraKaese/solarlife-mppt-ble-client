@@ -232,7 +232,7 @@ status_registers = VariableContainer(
     Variable(0x3050, True,  False, [0x04], "W", 100, "solar_panel_power", "Solar panel power", None, None),
     Variable(0x3052, False, False, [0x04], "kWh", 100, "solar_panel_daily_energy", "Daily solar panel energy", None, None),
     Variable(0x3053, True,  False, [0x04], "kWh", 100, "solar_panel_total_energy", "Total solar panel energy", None, None),
-    Variable(0x3055, True,  False, [0x04], "kWh", 100, "load_daily_energy", "Daily load energy", None, None),
+    Variable(0x3055, False, False, [0x04], "kWh", 100, "load_daily_energy", "Daily load energy", None, None),
     Variable(0x3056, True,  False, [0x04], "kWh", 100, "load_total_energy", "Total load energy", None, None),
     Variable(0x3058, False, False, [0x04], "min", 1, "total_light_time_during_the_day", "Total light time during the day", None, None),
     Variable(0x309D, False, False, [0x04], "", 1, "run_days", "Number of running days", None, None),
