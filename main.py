@@ -3,109 +3,67 @@
 import argparse
 import asyncio
 import signal
-import json
 
 import aiomqtt
 from bleak import BleakScanner
 from bleak.exc import BleakError, BleakDeviceNotFoundError
 
+from src.homeassistant import MqttSensor
 from src.bleclient import BleClient, Result
+from src.variables import variables
 
 send_config = True
+request_interval = 20   # In seconds
 reconnect_interval = 5  # In seconds
 
-async def mqtt_publish(details: dict[str, Result], client: aiomqtt.Client):
+async def request_and_publish_details(sensor: MqttSensor, mppt: BleClient) -> None:
     global send_config
-    # Define the base topic for MQTT Discovery
-    base_topic = "homeassistant"
-
-    # Define the device information
-    device_info = {
-        "identifiers": ["solarlife_mppt_ble"],
-        "name": "Solarlife MPPT",
-        "manufacturer": "Solarlife",
-    }
-
-    # Publish each item in the details dictionary to its own MQTT topic
-    for key, value in details.items():
-        state_topic = f"{base_topic}/sensor/solarlife/{key}/state"
-        topic = f"{base_topic}/sensor/solarlife/{key}/config"
-
-        # Create the MQTT Discovery payload
-        payload = {
-            "name": f"Solarlife {value.friendly_name}",
-            "device": device_info,
-            "unique_id": f"solarlife_{key}",
-            "state_topic": state_topic,
-            "unit_of_measurement": value.unit,
-        }
-        if "daily_energy" in key:
-            payload['device_class'] = "energy"
-            payload['state_class'] = "total_increasing"
-        elif "total_energy" in key:
-            payload['device_class'] = "energy"
-            payload['state_class'] = "total"
-        elif "voltage" in key:
-            payload['device_class'] = "voltage"
-            payload['state_class'] = "measurement"
-        elif "current" in key:
-            payload['device_class'] = "current"
-            payload['state_class'] = "measurement"
-        elif "power" in key:
-            payload['device_class'] = "power"
-            payload['state_class'] = "measurement"
-        elif "temperature" in key:
-            payload['device_class'] = "temperature"
-            payload['state_class'] = "measurement"
-        elif key == "battery_percentage":
-            payload['device_class'] = "battery"
-            payload['state_class'] = "measurement"
-
-        # Publish the MQTT Discovery payload
+    details = await mppt.request_details()
+    if details:
+        print(f"Battery: {details['battery_percentage'].value}% ({details['battery_voltage'].value}V)")
         if send_config:
-            print(f"Publishing MQTT Discovery payload for {key}")
-            await client.publish(topic, payload=json.dumps(payload), retain=True)
+            print(f"configuring {len(details)}/{len(variables)} entities")
+            await sensor.store_config(details)
+            send_config = False
+        
+        await sensor.publish(details)
+    else:
+        print("No values recieved")
 
-        # Publish the entity state
-        await client.publish(state_topic, payload=str(value.value))
-    send_config = False
-    
-async def main(address, host, port, username, password):
-    async def run_mppt():
-        while True:
-            try:
-                async with aiomqtt.Client(hostname=host, port=port, username=username, password=password) as client:
-                    print(f"Connecting to MQTT broker at {host}:{port}")
-                    while True:
-                        try:
-                            async with BleClient(address) as mppt:
-                                while True:
-                                    details = await mppt.request_details()
-                                    if details:
-                                        print(f"Battery: {details['battery_percentage'].value}% ({details['battery_voltage'].value}V)")
-                                        await mqtt_publish(details, client)
-                                    else:
-                                        print("No values recieved")
-                                    await asyncio.sleep(20.0)
+async def run_mppt(sensor: MqttSensor, address: str):
+    try:
+        async with BleClient(address) as mppt:
+            while True:
+                await request_and_publish_details()
+                await asyncio.sleep(request_interval)
 
-                        except BleakDeviceNotFoundError:
-                            print(f"BLE device with address {address} was not found")
-                            await asyncio.sleep(5)
-                        except BleakError as e:
-                            print(f"BLE error occurred: {e}")
-                            await asyncio.sleep(5)
-            except aiomqtt.MqttError as error:
-                print(f'Error "{error}". Reconnecting in {reconnect_interval} seconds.')
-                await asyncio.sleep(reconnect_interval)
-            except asyncio.CancelledError:
-                raise  # Re-raise the CancelledError to stop the task
-            except Exception as e:
-                print(f"An error occurred during BLE communication: {e}")
-                await asyncio.sleep(5)  # Wait for 5 seconds before retrying
+    except BleakDeviceNotFoundError:
+        print(f"BLE device with address {address} was not found")
+        await asyncio.sleep(reconnect_interval)
+    except BleakError as e:
+        print(f"BLE error occurred: {e}")
+        await asyncio.sleep(reconnect_interval)
 
+async def run_mqtt(address, host, port, username, password):
+    while True:
+        try:
+            async with MqttSensor(hostname=host, port=port, username=username, password=password) as sensor:
+                print(f"Connected to MQTT broker at {host}:{port}")
+                while True:
+                    await run_mppt(sensor, address)
+        except aiomqtt.MqttError as error:
+            print(f'Error "{error}". Reconnecting in {reconnect_interval} seconds.')
+            await asyncio.sleep(reconnect_interval)
+        except asyncio.CancelledError:
+            raise  # Re-raise the CancelledError to stop the task
+        except Exception as e:
+            print(f"An error occurred during BLE communication: {e}")
+            await asyncio.sleep(reconnect_interval)
+
+async def main(*args):
     try:
         loop = asyncio.get_running_loop()
-        task = loop.create_task(run_mppt())
+        task = loop.create_task(run_mqtt(*args))
 
         # Setup signal handler to cancel the task on termination
         for signame in {'SIGINT', 'SIGTERM'}:
