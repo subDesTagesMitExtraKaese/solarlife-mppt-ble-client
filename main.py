@@ -119,7 +119,7 @@ async def main(address, host, port, username, password):
 
 async def list_services(address):
     async with BleClient(address) as mppt:
-        mppt.list_services()
+        await mppt.list_services()
 
 async def scan_for_devices():
     devices = await BleakScanner.discover()

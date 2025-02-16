@@ -33,7 +33,7 @@ class BleClient(LumiaxClient):
         self.buffer += data  # Append the received data to the buffer
         if not self.is_complete(self.buffer):
             return
-        results = self.parse(self.start_address, buffer)
+        results = self.parse(self.start_address, self.buffer)
         self.response_queue.put_nowait({r.name: r for r in results})
 
     async def read(self, start_address: int, count: int, repeat = 10, timeout = 5) -> dict[str, Result]:
@@ -61,13 +61,18 @@ class BleClient(LumiaxClient):
         return "".join(map(chr, device_name))
 
     async def list_services(self):
+        service_text = "[Service]          "
+        charact_text = "  [Characteristic] "
+        descrip_text = "    [Descriptor]   "
+        value_text   = "      Value = "
         for service in self.client.services:
-            print("[Service] %s", service)
+            print(service_text, service)
             for char in service.characteristics:
-                print("  [Characteristic] ", char, ",".join(char.properties))
+                print(charact_text, char, ",".join(char.properties))
                 for descriptor in char.descriptors:
                     try:
+                        print(descrip_text, descriptor)
                         value = await self.client.read_gatt_descriptor(descriptor.handle)
-                        print("    [Descriptor] ", descriptor, value)
+                        print(value_text, "0x" + value.hex())
                     except Exception as e:
-                        print("    [Descriptor] ", descriptor, e)
+                        pass
