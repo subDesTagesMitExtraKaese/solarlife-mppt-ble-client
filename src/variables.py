@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, List, Tuple, Union
+from typing import Callable, List, Tuple, Union, Optional
 
 
 class FunctionCodes(Enum):
@@ -47,6 +47,12 @@ class VariableContainer:
 
     def items(self):
         return self._variable_map.items()
+    
+    def get(self, key: str) -> Optional[Variable]:
+        if isinstance(key, str):
+            return self._variable_map.get(key)
+        else:
+            raise TypeError("Key must be a variable name string.")
 
 def _get_functional_status_registers(function_codes: list[int], offset: int):
     return [
@@ -218,7 +224,7 @@ variables = VariableContainer([
     Variable(0x3053, True,  False, [0x04], "kWh", 100, "solar_panel_total_energy", "Total charging capacity", None, None),
     Variable(0x3055, True,  False, [0x04], "kWh", 100, "load_daily_energy", "The electricity consumption of the day", None, None),
     Variable(0x3056, True,  False, [0x04], "kWh", 100, "load_total_energy", "Total electricity consumption", None, None),
-    Variable(0x3058, False, False, [0x04], "Min", 1, "total_light_time_during_the_day", "Total light time during the day", None, None),
+    Variable(0x3058, False, False, [0x04], "min", 1, "total_light_time_during_the_day", "Total light time during the day", None, None),
     Variable(0x309D, False, False, [0x04], "", 1, "run_days", "The number of running days", None, None),
     Variable(0x30A0, False, False, [0x04], "V", 100, "battery_voltage", "Battery voltage", None, None),
     Variable(0x30A1, False, True,  [0x04], "A", 100, "battery_current", "Battery current", None, None),
@@ -311,44 +317,44 @@ variables = VariableContainer([
                     ["Manual", "T0T", "Timing switch"])[x], None),
     Variable(0x902C, False, False, [0x03, 0x06, 0x10], "", 0, "mt_series_manual_control_default", "MT Series manual control mode default setting",
         lambda x: ["On", "Off"][x], ("On", "Off")),
-    Variable(0x902D, False, False, [0x03, 0x06, 0x10], "Min", 1, "mt_series_timing_period_1", "MT Series timing opening period 1",
+    Variable(0x902D, False, False, [0x03, 0x06, 0x10], "min", 1, "mt_series_timing_period_1", "MT Series timing opening period 1",
         lambda x: ((x >> 8) & 0xFF) * 60 + max(x & 0xFF, 59), None),
-    Variable(0x902E, False, False, [0x03, 0x06, 0x10], "Min", 1, "mt_series_timing_period_2", "MT Series timing opening period 2",
+    Variable(0x902E, False, False, [0x03, 0x06, 0x10], "min", 1, "mt_series_timing_period_2", "MT Series timing opening period 2",
         lambda x: ((x >> 8) & 0xFF) * 60 + max(x & 0xFF, 59), None),
     Variable(0x902F, False, False, [0x03, 0x06, 0x10], "sec", 1, "timed_start_time_1_seconds", "Timed start time 1-seconds", None, None),
-    Variable(0x9030, False, False, [0x03, 0x06, 0x10], "Min", 1, "timed_start_time_1_minutes", "Timed start time 1-minute", None, None),
+    Variable(0x9030, False, False, [0x03, 0x06, 0x10], "min", 1, "timed_start_time_1_minutes", "Timed start time 1-minute", None, None),
     Variable(0x9031, False, False, [0x03, 0x06, 0x10], "hour", 1, "timed_start_time_1_hours", "Timed start time 1-hour", None, None),
     Variable(0x9032, False, False, [0x03, 0x06, 0x10], "sec", 1, "timed_off_time_1_seconds", "Timed off time 1-seconds", None, None),
-    Variable(0x9033, False, False, [0x03, 0x06, 0x10], "Min", 1, "timed_off_time_1_minutes", "Timed off time 1-minute", None, None),
+    Variable(0x9033, False, False, [0x03, 0x06, 0x10], "min", 1, "timed_off_time_1_minutes", "Timed off time 1-minute", None, None),
     Variable(0x9034, False, False, [0x03, 0x06, 0x10], "hour", 1, "timed_off_time_1_hours", "Timed off time 1-hour", None, None),
     Variable(0x9035, False, False, [0x03, 0x06, 0x10], "sec", 1, "timed_start_time_2_seconds", "Timed start time 2-seconds", None, None),
-    Variable(0x9036, False, False, [0x03, 0x06, 0x10], "Min", 1, "timed_start_time_2_minutes", "Timed start time 2-minute", None, None),
+    Variable(0x9036, False, False, [0x03, 0x06, 0x10], "min", 1, "timed_start_time_2_minutes", "Timed start time 2-minute", None, None),
     Variable(0x9037, False, False, [0x03, 0x06, 0x10], "hour", 1, "timed_start_time_2_hours", "Timed start time 2-hour", None, None),
     Variable(0x9038, False, False, [0x03, 0x06, 0x10], "sec", 1, "timed_off_time_2_seconds", "Timed off time 2-seconds", None, None),
-    Variable(0x9039, False, False, [0x03, 0x06, 0x10], "Min", 1, "timed_off_time_2_minutes", "Timed off time 2-minute", None, None),
+    Variable(0x9039, False, False, [0x03, 0x06, 0x10], "min", 1, "timed_off_time_2_minutes", "Timed off time 2-minute", None, None),
     Variable(0x903A, False, False, [0x03, 0x06, 0x10], "hour", 1, "timed_off_time_2_hours", "Timed off time 2-hour", None, None),
     Variable(0x903B, False, False, [0x03, 0x06, 0x10], "", 0, "time_control_period_selection", "Time control period selection",
         lambda x: ["1 period", "2 periods"][x], None),
     Variable(0x903C, False, False, [0x03, 0x06, 0x10], "V", 100, "light_controlled_dark_voltage", "Light controlled dark voltage", None, None),
-    Variable(0x903D, False, False, [0x03, 0x06, 0x10], "Min", 1, "day_night_delay_time", "Day/Night delay time", None, None),
+    Variable(0x903D, False, False, [0x03, 0x06, 0x10], "min", 1, "day_night_delay_time", "Day/Night delay time", None, None),
     Variable(0x903E, False, False, [0x03, 0x06, 0x10], "%", 0.1, "dc_series_timing_control_time_1_dimming", "DC series timing control time 1 dimming", None, None),
     Variable(0x903F, False, False, [0x03, 0x06, 0x10], "%", 0.1, "dc_series_timing_control_time_2_dimming", "DC series timing control time 2 dimming", None, None),
-    Variable(0x9040, False, False, [0x03, 0x06, 0x10], "Min", 1.0/30, "dc_series_time_1", "DC Series time 1", None, None),
+    Variable(0x9040, False, False, [0x03, 0x06, 0x10], "min", 1.0/30, "dc_series_time_1", "DC Series time 1", None, None),
     Variable(0x9041, False, False, [0x03, 0x06, 0x10], "%", 0.1, "dc_series_time_1_dimming", "DC Series the time 1 dimming", None, None),
-    Variable(0x9042, False, False, [0x03, 0x06, 0x10], "Min", 1.0/30, "dc_series_time_2", "DC Series time 2", None, None),
+    Variable(0x9042, False, False, [0x03, 0x06, 0x10], "min", 1.0/30, "dc_series_time_2", "DC Series time 2", None, None),
     Variable(0x9043, False, False, [0x03, 0x06, 0x10], "%", 0.1, "dc_series_time_2_dimming", "DC Series the time 2 dimming", None, None),
-    Variable(0x9044, False, False, [0x03, 0x06, 0x10], "Sec", 1.0/30, "dc_series_time_3", "DC Series time 3", None, None),
+    Variable(0x9044, False, False, [0x03, 0x06, 0x10], "sec", 1.0/30, "dc_series_time_3", "DC Series time 3", None, None),
     Variable(0x9045, False, False, [0x03, 0x06, 0x10], "%", 0.1, "dc_series_time_3_dimming", "DC Series the time 3 dimming", None, None),
-    Variable(0x9046, False, False, [0x03, 0x06, 0x10], "Sec", 1.0/30, "dc_series_time_4", "DC Series time 4", None, None),
+    Variable(0x9046, False, False, [0x03, 0x06, 0x10], "sec", 1.0/30, "dc_series_time_4", "DC Series time 4", None, None),
     Variable(0x9047, False, False, [0x03, 0x06, 0x10], "%", 0.1, "dc_series_time_4_dimming", "DC Series the time 4 dimming", None, None),
-    Variable(0x9048, False, False, [0x03, 0x06, 0x10], "Sec", 1.0/30, "dc_series_time_5", "DC Series time 5", None, None),
+    Variable(0x9048, False, False, [0x03, 0x06, 0x10], "sec", 1.0/30, "dc_series_time_5", "DC Series time 5", None, None),
     Variable(0x9049, False, False, [0x03, 0x06, 0x10], "%", 0.1, "dc_series_time_5_dimming", "DC Series the time 5 dimming", None, None),
     Variable(0x904A, False, False, [0x03, 0x06, 0x10], "A", 100, "dc_series_load_current_limit", "DC Series load current limit", None, None),
     Variable(0x904B, False, False, [0x03, 0x06, 0x10], "", 0, "dc_series_auto_dimming", "DC Series auto dimming",
         lambda x: ["Auto dimming", "365 mode", "No dimming", "No dimming"][x & 0xF], None),
     Variable(0x904C, False, False, [0x03, 0x06, 0x10], "V", 100, "dc_series_dimming_voltage", "DC Series dimming voltage", None, None),
     Variable(0x904D, False, False, [0x03, 0x06, 0x10], "%", 1, "dc_series_dimming_percentage", "DC Series dimming percentage", None, None),
-    Variable(0x904E, False, False, [0x03, 0x06, 0x10], "Sec", 0.1, "sensing_delay_off_time", "Sensing delay off time", None, None),
+    Variable(0x904E, False, False, [0x03, 0x06, 0x10], "sec", 0.1, "sensing_delay_off_time", "Sensing delay off time", None, None),
     Variable(0x904F, False, False, [0x03, 0x06, 0x10], "%", 0.1, "infrared_dimming_when_no_people", "Dimming of Infrared Series controller when no people", None, None),
     Variable(0x9052, False, False, [0x03, 0x06, 0x10], "", 0, "light_controlled_switch", "Light controlled switch", None, ("On", "Off")),
     Variable(0x9053, False, False, [0x03, 0x06, 0x10], "V", 100, "light_controlled_daybreak_voltage", "Light-control led daybreak voltage", None, None),

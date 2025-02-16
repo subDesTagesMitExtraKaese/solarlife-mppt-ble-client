@@ -24,6 +24,8 @@ class TestVariables(unittest.TestCase):
     def test_indexer(self):
         variable = variables['battery_percentage']
         self.assertEqual('battery_percentage', variable.name)
+        variable = variables.get('battery_percentage')
+        self.assertEqual('battery_percentage', variable.name)
         self.assertIsNotNone(variables.items())
 if __name__ == "__main__":
     unittest.main()

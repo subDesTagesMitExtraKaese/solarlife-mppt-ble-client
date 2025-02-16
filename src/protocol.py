@@ -1,6 +1,6 @@
 import struct
 from dataclasses import dataclass
-from typing import Any, List, Union, Tuple
+from typing import Any, List, Union, Tuple, Optional
 
 from .variables import variables, Variable, FunctionCodes
 from .crc import crc16
@@ -32,6 +32,12 @@ class ResultContainer:
 
     def items(self):
         return self._result_map.items()
+
+    def get(self, key: str) -> Optional[Result]:
+        if isinstance(key, str):
+            return self._result_map.get(key)
+        else:
+            raise TypeError("Key must be a variable name string.")
 
 class LumiaxClient:
     def __init__(self):
@@ -198,7 +204,9 @@ class LumiaxClient:
 
         return ResultContainer(results)
 
-    def _find_raw_value_by_brute_force(self, variable: Variable, value):
+    def _find_raw_value_by_brute_force(self, variable: Variable, value: str):
+        if variable.multiplier:
+            value = float(value)
         n_bits = 32 if variable.is_32_bit else 16
         if variable.is_signed:
             for i in range(0, 2**(n_bits-1) + 1):

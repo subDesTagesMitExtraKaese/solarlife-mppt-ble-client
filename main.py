@@ -10,39 +10,52 @@ from bleak.exc import BleakError, BleakDeviceNotFoundError
 
 from src.homeassistant import MqttSensor
 from src.bleclient import BleClient, Result
-from src.variables import variables
+from src.variables import variables, VariableContainer
 
-send_config = True
 request_interval = 20   # In seconds
 reconnect_interval = 5  # In seconds
 
 async def request_and_publish_details(sensor: MqttSensor, mppt: BleClient) -> None:
-    global send_config
     details = await mppt.request_details()
     if details:
         print(f"Battery: {details['battery_percentage'].value}% ({details['battery_voltage'].value}V)")
-        if send_config:
-            print(f"configuring {len(details)}/{len(variables)} entities")
-            await sensor.store_config(details)
-            send_config = False
-        
+        await sensor.store_config(details)
         await sensor.publish(details)
     else:
         print("No values recieved")
 
+async def subscribe_and_watch_switches(sensor: MqttSensor, mppt: BleClient):
+    variable = variables['manual_control_switch']
+    variable_container = VariableContainer([variable])
+    await sensor.subscribe(variable_container)
+    await sensor.store_config(variable_container)
+    for command in await sensor.get_commands():
+        results = mppt.write([command])
+        await sensor.publish(results)
+
 async def run_mppt(sensor: MqttSensor, address: str):
+    task = None
+    loop = asyncio.get_event_loop()
     try:
         async with BleClient(address) as mppt:
+            task = loop.create_task(subscribe_and_watch_switches(sensor, mppt))
             while True:
-                await request_and_publish_details()
+                await request_and_publish_details(sensor, mppt)
                 await asyncio.sleep(request_interval)
+                if not task.cancelled() and task.exception:
+                    break
 
     except BleakDeviceNotFoundError:
         print(f"BLE device with address {address} was not found")
-        await asyncio.sleep(reconnect_interval)
     except BleakError as e:
         print(f"BLE error occurred: {e}")
-        await asyncio.sleep(reconnect_interval)
+    finally:
+        if task:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
 async def run_mqtt(address, host, port, username, password):
     while True:
@@ -51,14 +64,14 @@ async def run_mqtt(address, host, port, username, password):
                 print(f"Connected to MQTT broker at {host}:{port}")
                 while True:
                     await run_mppt(sensor, address)
+                    await asyncio.sleep(reconnect_interval)
         except aiomqtt.MqttError as error:
             print(f'Error "{error}". Reconnecting in {reconnect_interval} seconds.')
-            await asyncio.sleep(reconnect_interval)
         except asyncio.CancelledError:
             raise  # Re-raise the CancelledError to stop the task
         except Exception as e:
             print(f"An error occurred during BLE communication: {e}")
-            await asyncio.sleep(reconnect_interval)
+        await asyncio.sleep(reconnect_interval)
 
 async def main(*args):
     try:

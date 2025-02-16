@@ -4,7 +4,7 @@ from bleak import BleakClient, BleakScanner
 from bleak.backends.characteristic import BleakGATTCharacteristic
 
 from src.crc import crc16
-from src.protocol import LumiaxClient, ResultContainer
+from src.protocol import LumiaxClient, ResultContainer, Result
 
 class BleClient(LumiaxClient):
     DEVICE_NAME_UUID = "00002a00-0000-1000-8000-00805f9b34fb"
@@ -55,6 +55,23 @@ class BleClient(LumiaxClient):
 
     async def request_details(self) -> ResultContainer:
         return await self.read(0x3030, 43)
+    
+    async def write(self, results: list[Result], repeat = 10, timeout = 5) -> ResultContainer:
+        async with self.lock:
+            start_address, command = self.get_write_command(0xFE, results)
+            self.response_queue = asyncio.Queue() # Clear the queue
+            i = 0
+            # send the command multiple times
+            while self.response_queue.empty() and i < repeat:
+                i += 1
+                await self.client.write_gatt_char(self.WRITE_UUID, command)
+                try:
+                    # Wait for either a response or timeout
+                    await asyncio.wait_for(self.response_queue.get(), timeout=timeout)
+                    return results
+                except asyncio.TimeoutError:
+                    pass
+            return None
 
     async def get_device_name(self):
         device_name = await self.client.read_gatt_char(self.DEVICE_NAME_UUID)  # Read the device name from the BLE device
