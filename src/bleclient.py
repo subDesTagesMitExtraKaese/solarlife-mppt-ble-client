@@ -59,7 +59,10 @@ class BleClient(LumiaxClient):
             return ResultContainer([])
 
     async def request_details(self) -> ResultContainer:
-        return await self.read(0x3030, 43)
+        return await self.read(0x3030, 41)
+
+    async def request_parameters(self) -> ResultContainer:
+        return await self.read(0x9021, 12)
     
     async def write(self, results: list[Result], repeat = 10, timeout = 5) -> ResultContainer:
         async with self.lock:

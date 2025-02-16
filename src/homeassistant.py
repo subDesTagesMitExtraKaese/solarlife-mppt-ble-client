@@ -75,12 +75,15 @@ class MqttSensor(Client):
             payload = {
                 "name": variable.friendly_name,
                 "device": self.device_info,
+                "object_id": key,
                 "unique_id": f"solarlife_{key}",
                 "state_topic": state_topic,
             }
 
             if variable.multiplier != 0:
                 payload["unit_of_measurement"] = variable.unit
+                payload["mode"] = "box"
+                payload["min"] = 0
                 
             if "daily" in key and "Wh" in variable.unit:
                 payload['device_class'] = "energy"
@@ -106,7 +109,7 @@ class MqttSensor(Client):
             elif key == "battery_percentage":
                 payload['device_class'] = "battery"
                 payload['state_class'] = "measurement"
-            elif "timing_period" in key or "delay" in key:
+            elif "timing_period" in key or "delay" in key or "total_light_time" in key:
                 payload['device_class'] = "duration"
 
             if variable.binary_payload:
@@ -122,13 +125,16 @@ class MqttSensor(Client):
             # Publish the MQTT Discovery payload
             await super().publish(config_topic, payload=json.dumps(payload), retain=True)
 
-    async def publish(self, details: ResultContainer):
+    async def publish(self, results: ResultContainer):
+        await self.store_config(results)
         # Publish each item in the details dictionary to its own MQTT topic
-        for key, value in details.items():
-            state_topic = self.get_state_topic(value)
+        for key, result in results.items():
+            state_topic = self.get_state_topic(result)
+            is_writable = FunctionCodes.WRITE_MEMORY_SINGLE.value in result.function_codes or \
+                          FunctionCodes.WRITE_STATUS_REGISTER.value in result.function_codes
 
             # Publish the entity state
-            await super().publish(state_topic, payload=str(value.value))
+            await super().publish(state_topic, payload=str(result.value), retain=is_writable)
 
     async def subscribe(self, variables: VariableContainer):
         for key, variable in variables.items():

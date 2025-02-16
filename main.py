@@ -11,7 +11,7 @@ from bleak.exc import BleakError, BleakDeviceNotFoundError
 
 from src.homeassistant import MqttSensor
 from src.bleclient import BleClient, Result
-from src.variables import variables, VariableContainer
+from src.variables import variables, VariableContainer, battery_and_load_parameters, switches
 
 request_interval = 20   # In seconds
 reconnect_interval = 5  # In seconds
@@ -20,16 +20,13 @@ async def request_and_publish_details(sensor: MqttSensor, mppt: BleClient) -> No
     details = await mppt.request_details()
     if details:
         print(f"Battery: {details['battery_percentage'].value}% ({details['battery_voltage'].value}V)")
-        await sensor.store_config(details)
         await sensor.publish(details)
     else:
         print("No values recieved")
 
-async def subscribe_and_watch_switches(sensor: MqttSensor, mppt: BleClient):
-    variable = variables['manual_control_switch']
-    variable_container = VariableContainer([variable])
-    await sensor.subscribe(variable_container)
-    await sensor.store_config(variable_container)
+async def subscribe_and_watch(sensor: MqttSensor, mppt: BleClient):
+    parameters = battery_and_load_parameters[:12] + switches
+    await sensor.subscribe(parameters)
     while True:
         command = await sensor.get_command()
         print(f"Received command to set {command.name} to '{command.value}'")
@@ -41,7 +38,9 @@ async def run_mppt(sensor: MqttSensor, address: str):
     loop = asyncio.get_event_loop()
     try:
         async with BleClient(address) as mppt:
-            task = loop.create_task(subscribe_and_watch_switches(sensor, mppt))
+            task = loop.create_task(subscribe_and_watch(sensor, mppt))
+            parameters = await mppt.request_parameters()
+            await sensor.publish(parameters)
             while True:
                 await request_and_publish_details(sensor, mppt)
                 await asyncio.sleep(request_interval)

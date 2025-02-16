@@ -27,5 +27,8 @@ class TestVariables(unittest.TestCase):
         variable = variables.get('battery_percentage')
         self.assertEqual('battery_percentage', variable.name)
         self.assertIsNotNone(variables.items())
+    def test_slice(self):
+        x = variables[4:12]
+        self.assertEqual(8, len(x))
 if __name__ == "__main__":
     unittest.main()

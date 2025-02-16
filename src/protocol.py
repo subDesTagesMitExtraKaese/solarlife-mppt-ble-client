@@ -16,11 +16,13 @@ class ResultContainer:
         self._results = results
         self._result_map = {res.name: res for res in results}
 
-    def __getitem__(self, key: Union[int, str]) -> Result:
+    def __getitem__(self, key: Union[int, str, slice]) -> Result:
         if isinstance(key, int):
             return self._results[key]
         elif isinstance(key, str):
             return self._result_map[key]
+        elif isinstance(key, slice):
+            return ResultContainer(self._results[key])
         else:
             raise TypeError("Key must be an integer index or a result name string.")
 
@@ -29,6 +31,9 @@ class ResultContainer:
 
     def __iter__(self):
         return iter(self._results)
+    
+    def __add__(self, other) -> list[Result]:
+        return ResultContainer(self._results + other._results)
     
     def __bool__(self):
         return len(self._results) > 0
@@ -75,7 +80,7 @@ class LumiaxClient:
             if raw_value == None:
                 raise Exception(f"invalid value for {variable.name}: '{value}'")
         elif variable.binary_payload and value == variable.binary_payload[0]:
-            raw_value = 1
+            raw_value = 0xFF00
         elif variable.binary_payload and value == variable.binary_payload[1]:
             raw_value = 0
         elif variable.binary_payload:
@@ -175,6 +180,8 @@ class LumiaxClient:
         if len(buffer) < 4:
             return False
         device_id = buffer[0]
+        if not buffer[1] in FunctionCodes._value2member_map_:
+            return False
         function_code = FunctionCodes(buffer[1])
         if function_code in [FunctionCodes.READ_MEMORY, FunctionCodes.READ_PARAMETER, FunctionCodes.READ_STATUS_REGISTER]:
             data_length = buffer[2]

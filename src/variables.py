@@ -31,19 +31,24 @@ class VariableContainer:
         self._variables = variables
         self._variable_map = {var.name: var for var in variables}
 
-    def __getitem__(self, key: Union[int, str]) -> Variable:
+    def __getitem__(self, key: Union[int, str, slice]) -> Variable:
         if isinstance(key, int):
             return self._variables[key]
         elif isinstance(key, str):
             return self._variable_map[key]
+        elif isinstance(key, slice):
+            return VariableContainer(self._variables[key])
         else:
-            raise TypeError("Key must be an integer index or a variable name string.")
+            raise TypeError("Key must be an integer index, a variable name string, or a slice.")
 
     def __len__(self):
         return len(self._variables)
 
     def __iter__(self):
         return iter(self._variables)
+    
+    def __add__(self, other):
+        return VariableContainer(self._variables + other._variables)
 
     def __bool__(self):
         return len(self._variables) > 0
@@ -125,7 +130,7 @@ def _get_functional_status_registers(function_codes: list[int], offset: int):
         # Variable(offset + 3, False, False, function_codes, "", 0, "controller_functional_status_4", "Controller functional status 4", None, None),
     ]
 
-def _get_status_registers(offset: int):
+def _get_device_status_registers(offset: int):
     return [
         # Battery status
         Variable(offset, False, False, [0x04], "", 0, "battery_temperature_protection_status", "Battery temperature protection status",
@@ -164,13 +169,15 @@ def _get_status_registers(offset: int):
             lambda x: (x >> 0) & 0x1 == 1, ("True", "False")),
     ]
 
-variables = VariableContainer([
+real_time_status = VariableContainer([
     Variable(0x2000, False, False, [0x02], "", 0, "equipment_internal_over_temperature", "Equipment internal over temperature",
         lambda x: ["Normal", "Over temperature"][x], None),
     Variable(0x200C, False, False, [0x02], "", 0, "day_or_night", "Day or night",
         lambda x: ["Day", "Night"][x], None),
+])
 
-] + _get_functional_status_registers([0x04], 0x3011) + [
+status_registers = VariableContainer(
+    _get_functional_status_registers([0x04], 0x3011) + [
 
     Variable(0x3015, False, False, [0x04], "V", 100, "lvd_min_setting_value", "Low voltage detect min setting value", None, None),
     Variable(0x3016, False, False, [0x04], "V", 100, "lvd_max_setting_value", "Low voltage detect max setting value", None, None),
@@ -200,7 +207,7 @@ variables = VariableContainer([
     Variable(0x3031, False, False, [0x04], "", 1, "run_days", "Number of running days", None, None),
     Variable(0x3032, False, False, [0x04], "V", 100, "battery_voltage_level", "Current battery voltage level", None, None),
 
-] + _get_status_registers(0x3033) + [
+    ] + _get_device_status_registers(0x3033) + [
 
     Variable(0x3036, False, False, [0x04], "℃", 100, "environment_temperature", "Environment temperature", None, None),
     Variable(0x3037, False, False, [0x04], "℃", 100, "device_built_in_temperature", "Device built-intemperature", None, None),
@@ -223,30 +230,31 @@ variables = VariableContainer([
     Variable(0x304E, False, False, [0x04], "V", 100, "solar_panel_voltage", "Solar panel voltage", None, None),
     Variable(0x304F, False, False, [0x04], "A", 100, "solar_panel_current", "Solar panel current", None, None),
     Variable(0x3050, True,  False, [0x04], "W", 100, "solar_panel_power", "Solar panel power", None, None),
-    Variable(0x3052, False, False, [0x04], "kWh", 100, "solar_panel_daily_energy", "The charging capacity of the day", None, None),
-    Variable(0x3053, True,  False, [0x04], "kWh", 100, "solar_panel_total_energy", "Total charging capacity", None, None),
-    Variable(0x3055, True,  False, [0x04], "kWh", 100, "load_daily_energy", "The electricity consumption of the day", None, None),
-    Variable(0x3056, True,  False, [0x04], "kWh", 100, "load_total_energy", "Total electricity consumption", None, None),
+    Variable(0x3052, False, False, [0x04], "kWh", 100, "solar_panel_daily_energy", "Daily solar panel energy", None, None),
+    Variable(0x3053, True,  False, [0x04], "kWh", 100, "solar_panel_total_energy", "Total solar panel energy", None, None),
+    Variable(0x3055, True,  False, [0x04], "kWh", 100, "load_daily_energy", "Daily load energy", None, None),
+    Variable(0x3056, True,  False, [0x04], "kWh", 100, "load_total_energy", "Total load energy", None, None),
     Variable(0x3058, False, False, [0x04], "min", 1, "total_light_time_during_the_day", "Total light time during the day", None, None),
-    Variable(0x309D, False, False, [0x04], "", 1, "run_days", "The number of running days", None, None),
+    Variable(0x309D, False, False, [0x04], "", 1, "run_days", "Number of running days", None, None),
     Variable(0x30A0, False, False, [0x04], "V", 100, "battery_voltage", "Battery voltage", None, None),
     Variable(0x30A1, False, True,  [0x04], "A", 100, "battery_current", "Battery current", None, None),
     Variable(0x30A2, False, False, [0x04], "℃", 100, "environment_temperature", "Environment temperature", None, None),
 
-] + _get_status_registers(0x30A3) + [
+    ] + _get_device_status_registers(0x30A3) + [
 
     Variable(0x30A6, False, False, [0x04], "", 1, "battery_empty_times", "Battery empty times", None, None),
     Variable(0x30A7, False, False, [0x04], "", 1, "battery_full_times", "Battery full times", None, None),
-    Variable(0x30A8, False, False, [0x04], "V", 100, "battery_daily_voltage_maximum", "The highest battery voltage today", None, None),
-    Variable(0x30A9, False, False, [0x04], "V", 100, "battery_daily_voltage_minimum", "The lowest battery voltage today", None, None),
+    Variable(0x30A8, False, False, [0x04], "V", 100, "battery_daily_voltage_maximum", "Highest battery voltage today", None, None),
+    Variable(0x30A9, False, False, [0x04], "V", 100, "battery_daily_voltage_minimum", "Lowest battery voltage today", None, None),
     Variable(0x3125, False, False, [0x04], "V", 100, "load_voltage", "Load voltage", None, None),
     Variable(0x3126, False, False, [0x04], "A", 100, "load_current", "Load current", None, None),
     Variable(0x3127, True,  False, [0x04], "W", 100, "load_power", "Load power", None, None),
-    Variable(0x3129, False, False, [0x04], "kWh", 100, "load_daily_energy", "The electricity consumption of the day", None, None),
-    Variable(0x312E, True,  False, [0x04], "kWh", 100, "load_total_energy", "Total electricity consumption", None, None),
+    Variable(0x3129, False, False, [0x04], "kWh", 100, "load_daily_energy", "Daily load energy", None, None),
+    Variable(0x312E, True,  False, [0x04], "kWh", 100, "load_total_energy", "Total load energy", None, None),
     Variable(0x316C, False, False, [0x04], "", 1, "run_days", "The number of running days", None, None),
-    
-    # Factory settings
+])
+
+rated_parameters = VariableContainer([
     Variable(0x3000, False, False, [0x04], "V", 100, "solar_panel_rated_voltage", "Solar panel rated voltage", None, None),
     Variable(0x3001, False, False, [0x04], "A", 100, "solar_panel_rated_current", "Solar panel rated current", None, None),
     Variable(0x3002, True,  False, [0x04], "W", 100, "solar_panel_rated_power", "Solar panel rated power", None, None),
@@ -256,8 +264,10 @@ variables = VariableContainer([
     Variable(0x3008, False, False, [0x04], "V", 100, "load_rated_voltage", "Load rated voltage", None, None),
     Variable(0x3009, False, False, [0x04], "A", 100, "load_rated_current", "Load rated current", None, None),
     Variable(0x300A, True,  False, [0x04], "W", 100, "load_rated_power", "Load rated power", None, None),
+])
 
-] + _get_functional_status_registers([0x03], 0x8FF0) + [
+read_only_registers = VariableContainer(
+    _get_functional_status_registers([0x03], 0x8FF0) + [
 
     Variable(0x8FF4, False, False, [0x03], "V", 100, "lvd_min_setting_value", "Low voltage detect min setting value", None, None),
     Variable(0x8FF5, False, False, [0x03], "V", 100, "lvd_max_setting_value", "Low voltage detect max setting value", None, None),
@@ -285,7 +295,9 @@ variables = VariableContainer([
     Variable(0x900A, False, False, [0x03], "V", 100, "cvt_cvr_min_dropout_voltage", "Charge target and recovery voltage min allow dropout voltage for Li-series controller", None, None),
     Variable(0x900B, False, False, [0x03], "V", 100, "lvd_lvr_min_dropout_voltage", "Low voltage detect and recovery min allow dropout voltage", None, None),
     Variable(0x900C, False, False, [0x03], "V", 100, "min_allow_dropout_voltage", "CVR and LVD & CVT and LVR Min allow dropout voltage", None, None),
+])
 
+device_parameters = VariableContainer([
     Variable(0x9017, False, False, [0x03, 0x06, 0x10], "ss", 1, "real_time_clock_second", "Real-time clock second", None, None),
     Variable(0x9018, False, False, [0x03, 0x06, 0x10], "mm", 1, "real_time_clock_minute", "Real-time clock minute", None, None),
     Variable(0x9019, False, False, [0x03, 0x06, 0x10], "hh", 1, "real_time_clock_hour", "Real-time clock hour", None, None),
@@ -301,6 +313,9 @@ variables = VariableContainer([
                     str(max((x>> 4) & 0xF, 9)) + 
                     str(max((x>> 0) & 0xF, 9)), None),
     Variable(0x9020, False, False, [0x03, 0x06, 0x10], "", 1, "slave_id", "Slave ID", None, None),
+])
+
+battery_and_load_parameters = VariableContainer([
     Variable(0x9021, False, False, [0x03, 0x06, 0x10], "", 0, "battery_type", "Battery type",
         lambda x: ["Lithium", "Liquid", "GEL", "AGM"][(x >>  0) & 0xF], None),
     Variable(0x9022, False, False, [0x03, 0x06, 0x10], "V", 100, "low_voltage_protection_voltage", "Low voltage protection",  None, None),
@@ -364,7 +379,9 @@ variables = VariableContainer([
     Variable(0x9054, False, False, [0x03, 0x06, 0x10], "%", 1, "dimming_percentage", "Dimming percentage for load test", None, None),
     Variable(0x9069, False, False, [0x03, 0x06, 0x10], "A", 100, "maximum_charging_current_setting", "Maximum charging current setting", None, None),
     Variable(0x906A, False, False, [0x03, 0x06, 0x10], "℃", 100, "over_temperature_protection", "Over temperature protection", None, None),
+])
 
+switches = VariableContainer([
     Variable(0x0000, False, False, [0x05], "", 0, "manual_control_switch", "Manual control switch", None, ("On", "Off")),
     Variable(0x0001, False, False, [0x05], "", 0, "test_key_trigger", "Test key on/off", None, ("On", "Off")),
     Variable(0x0002, False, False, [0x05], "", 0, "dc_series_timing_control_mode_switch", "DC Series timing control mode switch", None, ("On", "Off")),
@@ -376,3 +393,13 @@ variables = VariableContainer([
     Variable(0x000B, False, False, [0x05], "", 0, "Clear_charge_discharge_ah", "Clear charge/discharge AH", None, ("Clear", "")),
     Variable(0x000C, False, False, [0x05], "", 0, "clear_all", "Clear all of the above historical data", None, ("Clear", "")),
 ])
+
+variables = (
+    real_time_status +
+    status_registers +
+    rated_parameters +
+    read_only_registers +
+    device_parameters +
+    battery_and_load_parameters +
+    switches
+)
