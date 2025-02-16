@@ -4,7 +4,7 @@ from bleak import BleakClient, BleakScanner
 from bleak.backends.characteristic import BleakGATTCharacteristic
 
 from src.crc import crc16
-from src.protocol import LumiaxClient, Result
+from src.protocol import LumiaxClient, ResultContainer
 
 class BleClient(LumiaxClient):
     DEVICE_NAME_UUID = "00002a00-0000-1000-8000-00805f9b34fb"
@@ -34,9 +34,9 @@ class BleClient(LumiaxClient):
         if not self.is_complete(self.buffer):
             return
         results = self.parse(self.start_address, self.buffer)
-        self.response_queue.put_nowait({r.name: r for r in results})
+        self.response_queue.put_nowait(results)
 
-    async def read(self, start_address: int, count: int, repeat = 10, timeout = 5) -> dict[str, Result]:
+    async def read(self, start_address: int, count: int, repeat = 10, timeout = 5) -> ResultContainer:
         async with self.lock:
             self.start_address = start_address
             command = self.get_read_command(0xFE, start_address, count)
@@ -53,7 +53,7 @@ class BleClient(LumiaxClient):
                     pass
             return None
 
-    async def request_details(self) -> dict[str, Result]:
+    async def request_details(self) -> ResultContainer:
         return await self.read(0x3030, 43)
 
     async def get_device_name(self):

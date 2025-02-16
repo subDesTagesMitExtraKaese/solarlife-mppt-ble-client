@@ -3,7 +3,7 @@ import sys
 sys.path.append("..")
 
 from src.variables import variables
-from src.protocol import LumiaxClient
+from src.protocol import LumiaxClient, Result
 
 class TestTransaction(unittest.TestCase):
 
@@ -131,14 +131,16 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(end_address - start_address + 1, count)
 
         items = [v for v in variables if v.address >= start_address and v.address <= end_address]
-        values = list(zip(items, ["Lithium", 10.6, 11.8, 14.4, 14.7, 13.6, "Auto", 14.4, 14.0, "Normal charging"]))
+        values = ["Lithium", 10.6, 11.8, 14.4, 14.7, 13.6, "Auto", 14.4, 14.0, "Normal charging"]
+        results = [Result(**vars(variable), value=value) for variable, value in (zip(items, values))]
 
         send_buf = bytes([0x01, 0x10, 0x90, 0x21, 0x00, 0x0A, 0x14, 0x00, 0x00, 0x04, 0x24, 0x04, 0x9C, 0x05, 0xA0, 0x05, 0xBE, 0x05, 0x50, 0x00, 0x00, 0x05, 0xA0, 0x05, 0x78, 0x00, 0x00, 0xCC, 0xE7])
-        self.assertEqual(send_buf, self.client.get_write_command(device_id, values))
+        start_address, data = self.client.get_write_command(device_id, results)
+        self.assertEqual(send_buf, data)
 
         recv_buf = bytes([0x01, 0x10, 0x90, 0x21, 0x00, 0x0A, 0x3D, 0x04])
         self.assertEqual(len(recv_buf) - 4, 4)
         results = self.client.parse(start_address, recv_buf)
-        self.assertListEqual(results, [])
+        self.assertListEqual(list(results), [])
 if __name__ == "__main__":
     unittest.main()

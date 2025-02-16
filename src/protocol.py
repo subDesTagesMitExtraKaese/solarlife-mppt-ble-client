@@ -1,6 +1,6 @@
 import struct
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, List, Union, Tuple
 
 from .variables import variables, Variable, FunctionCodes
 from .crc import crc16
@@ -10,6 +10,28 @@ type Value = str|int|float
 @dataclass
 class Result(Variable):
     value: Value
+
+class ResultContainer:
+    def __init__(self, results: List[Result]):
+        self._results = results
+        self._result_map = {res.name: res for res in results}
+
+    def __getitem__(self, key: Union[int, str]) -> Result:
+        if isinstance(key, int):
+            return self._results[key]
+        elif isinstance(key, str):
+            return self._result_map[key]
+        else:
+            raise TypeError("Key must be an integer index or a result name string.")
+
+    def __len__(self):
+        return len(self._results)
+
+    def __iter__(self):
+        return iter(self._results)
+
+    def items(self):
+        return self._result_map.items()
 
 class LumiaxClient:
     def __init__(self):
@@ -79,20 +101,20 @@ class LumiaxClient:
         ])
         return result + crc16(result)
 
-    def get_write_command(self, device_id: int, values: list[(Variable, Any)]) -> bytes:
-        if not values:
+    def get_write_command(self, device_id: int, results: list[Result]) -> Tuple[int, bytes]:
+        if not results:
             raise Exception(f"values list is empty")
-        values.sort(key=lambda x: x[0].address)
-        address = values[0][0].address
-        for variable, value in values:
-            if value is None:
-                raise Exception(f"value of {variable.name} ({hex(variable.address)}) is empty")
-            if address < variable.address:
-                raise Exception(f"variables are not continuous at {hex(variable.address)}")
-            address = variable.address + (2 if variable.is_32_bit else 1)
+        results.sort(key=lambda x: x.address)
+        address = results[0].address
+        for result in results:
+            if result.value is None:
+                raise Exception(f"value of {result.name} ({hex(result.address)}) is empty")
+            if address < result.address:
+                raise Exception(f"variables are not continuous at {hex(result.address)}")
+            address = result.address + (2 if result.is_32_bit else 1)
 
-        start_variable = values[0][0]
-        end_variable = values[-1][0]
+        start_variable = results[0]
+        end_variable = results[-1]
         start_address = start_variable.address
         end_address = end_variable.address + (1 if end_variable.is_32_bit else 0)
         count = end_address - start_address + 1
@@ -112,7 +134,7 @@ class LumiaxClient:
                 byte_count,
             ])
         else:
-            if FunctionCodes.WRITE_STATUS_REGISTER.value in values[0][0].function_codes:
+            if FunctionCodes.WRITE_STATUS_REGISTER.value in results[0].function_codes:
                 function_code = FunctionCodes.WRITE_STATUS_REGISTER
             else:
                 function_code = FunctionCodes.WRITE_MEMORY_SINGLE
@@ -123,16 +145,16 @@ class LumiaxClient:
                 start_address & 0xFF,
             ])
 
-        if not all(function_code.value in x[0].function_codes for x in values):
+        if not all(function_code.value in x.function_codes for x in results):
             raise Exception(f"function code {function_code.name} is not supported for all addresses")
 
         data = bytearray(byte_count)
-        for variable, value in values:
-            offset = (variable.address - start_address) * 2
-            self.value_to_bytes(variable, data, offset, value)
+        for result in results:
+            offset = (result.address - start_address) * 2
+            self.value_to_bytes(result, data, offset, result.value)
 
         result = header + bytes(data)
-        return result + crc16(result)
+        return start_address, result + crc16(result)
 
     def is_complete(self, buffer: bytes) -> bool:
         if len(buffer) < 4:
@@ -145,9 +167,10 @@ class LumiaxClient:
         else:
             return len(buffer) >= 8
 
-    def parse(self, start_address: int, buffer: bytes) -> list[Result]:
+    def parse(self, start_address: int, buffer: bytes) -> ResultContainer:
         self.device_id = buffer[0]
         function_code = FunctionCodes(buffer[1])
+        results = []
         if function_code in [FunctionCodes.READ_MEMORY, FunctionCodes.READ_PARAMETER, FunctionCodes.READ_STATUS_REGISTER]:
             data_length = buffer[2]
             received_crc = buffer[3+data_length:3+data_length+2]
@@ -155,7 +178,6 @@ class LumiaxClient:
             if received_crc != calculated_crc:
                 raise Exception(f"CRC mismatch ({calculated_crc} != {received_crc})")
 
-            results = []
             address = start_address
             cursor = 3
             while cursor < data_length + 3:
@@ -165,8 +187,6 @@ class LumiaxClient:
                     results.append(Result(**vars(variable), value=value))
                 cursor += 2
                 address += 1
-
-            return results
         else:
             address = struct.unpack_from('>H', buffer, 2)[0]
             if address != start_address:
@@ -175,7 +195,8 @@ class LumiaxClient:
             calculated_crc = crc16(buffer[:6])
             if received_crc != calculated_crc:
                 raise Exception(f"CRC mismatch ({calculated_crc} != {received_crc})")
-            return []
+
+        return ResultContainer(results)
 
     def _find_raw_value_by_brute_force(self, variable: Variable, value):
         n_bits = 32 if variable.is_32_bit else 16
