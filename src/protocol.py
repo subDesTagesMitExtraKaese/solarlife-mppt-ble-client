@@ -29,6 +29,9 @@ class ResultContainer:
 
     def __iter__(self):
         return iter(self._results)
+    
+    def __bool__(self):
+        return len(self._results) > 0
 
     def items(self):
         return self._result_map.items()
@@ -65,12 +68,18 @@ class LumiaxClient:
         return value
 
     def value_to_bytes(self, variable: Variable, buffer: bytearray, offset: int, value: Value) -> int:
-        if variable.multiplier:
+        if variable.multiplier and not variable.func:
             raw_value = round(float(value) * variable.multiplier)
         elif variable.func:
             raw_value = self._find_raw_value_by_brute_force(variable, value)
             if raw_value == None:
                 raise Exception(f"invalid value for {variable.name}: '{value}'")
+        elif variable.binary_payload and value == variable.binary_payload[0]:
+            raw_value = 1
+        elif variable.binary_payload and value == variable.binary_payload[1]:
+            raw_value = 0
+        elif variable.binary_payload:
+            raise Exception(f"invalid binary value for {variable.name}: '{value}'")
         else:
             raw_value = int(value)
 
@@ -182,7 +191,7 @@ class LumiaxClient:
             received_crc = buffer[3+data_length:3+data_length+2]
             calculated_crc = crc16(buffer[:3+data_length])
             if received_crc != calculated_crc:
-                raise Exception(f"CRC mismatch ({calculated_crc} != {received_crc})")
+                raise Exception(f"CRC mismatch (0x{calculated_crc.hex()} != 0x{received_crc.hex()})")
 
             address = start_address
             cursor = 3
@@ -200,13 +209,18 @@ class LumiaxClient:
             received_crc = buffer[6:8]
             calculated_crc = crc16(buffer[:6])
             if received_crc != calculated_crc:
-                raise Exception(f"CRC mismatch ({calculated_crc} != {received_crc})")
+                raise Exception(f"CRC mismatch (0x{calculated_crc.hex()} != 0x{received_crc.hex()})")
+            
+            if function_code in [FunctionCodes.WRITE_MEMORY_SINGLE, FunctionCodes.WRITE_STATUS_REGISTER]:
+                variable = [v for v in variables if address == v.address and function_code.value in v.function_codes][0]
+                value = self.bytes_to_value(variable, buffer, 4)
+                results.append(Result(**vars(variable), value=value))
 
         return ResultContainer(results)
 
     def _find_raw_value_by_brute_force(self, variable: Variable, value: str):
         if variable.multiplier:
-            value = float(value)
+            value = float(value) * variable.multiplier
         n_bits = 32 if variable.is_32_bit else 16
         if variable.is_signed:
             for i in range(0, 2**(n_bits-1) + 1):

@@ -45,6 +45,9 @@ class VariableContainer:
     def __iter__(self):
         return iter(self._variables)
 
+    def __bool__(self):
+        return len(self._variables) > 0
+
     def items(self):
         return self._variable_map.items()
     

@@ -16,19 +16,20 @@ class MqttSensor(Client):
     # Define the device information
     device_info = {
         "identifiers": ["solarlife_mppt_ble"],
-        "name": "Solarlife MPPT",
+        "name": "Solarlife",
         "manufacturer": "Solarlife",
     }
 
     def __init__(self, *args, **kwargs):
-        super(MqttSensor, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.known_names = set()
+        self.subscribed_names = set()
 
     # https://www.home-assistant.io/integrations/#search/mqtt
     def get_platform(self, variable: Variable) -> str:
-        is_writable = FunctionCodes.WRITE_MEMORY_SINGLE in value.function_codes or \
-                      FunctionCodes.WRITE_STATUS_REGISTER in value.function_codes
-        is_numeric = value.multiplier != 0
+        is_writable = FunctionCodes.WRITE_MEMORY_SINGLE.value in variable.function_codes or \
+                      FunctionCodes.WRITE_STATUS_REGISTER.value in variable.function_codes
+        is_numeric = variable.multiplier != 0
         if variable.binary_payload:
             on, off = variable.binary_payload
             if is_writable and off:
@@ -62,10 +63,13 @@ class MqttSensor(Client):
             if key in self.known_names:
                 continue
             self.known_names.add(key)
-            print(f"publishing homeassistant config for {key}")
+
+            platform = self.get_platform(variable)
             config_topic = self.get_config_topic(variable)
             state_topic = self.get_state_topic(variable)
             command_topic = self.get_command_topic(variable)
+
+            print(f"Publishing homeassistant config for {platform} {key}")
 
             # Create the MQTT Discovery payload
             payload = {
@@ -111,12 +115,12 @@ class MqttSensor(Client):
                 payload["payload_off"] = off
 
             # Handle writable entities
-            if FunctionCodes.WRITE_MEMORY_SINGLE in variable.function_codes or \
-               FunctionCodes.WRITE_STATUS_REGISTER in variable.function_codes:
+            if FunctionCodes.WRITE_MEMORY_SINGLE.value in variable.function_codes or \
+               FunctionCodes.WRITE_STATUS_REGISTER.value in variable.function_codes:
                 payload["command_topic"] = command_topic
 
             # Publish the MQTT Discovery payload
-            await self.publish(config_topic, payload=json.dumps(payload), retain=True)
+            await super().publish(config_topic, payload=json.dumps(payload), retain=True)
 
     async def publish(self, details: ResultContainer):
         # Publish each item in the details dictionary to its own MQTT topic
@@ -124,18 +128,24 @@ class MqttSensor(Client):
             state_topic = self.get_state_topic(value)
 
             # Publish the entity state
-            await super(MqttSensor, self).publish(state_topic, payload=str(value.value))
+            await super().publish(state_topic, payload=str(value.value))
 
     async def subscribe(self, variables: VariableContainer):
         for key, variable in variables.items():
-            if FunctionCodes.WRITE_MEMORY_SINGLE in value.function_codes or \
-               FunctionCodes.WRITE_STATUS_REGISTER in value.function_codes:
-                command_topic = self.get_command_topic(value)
-                await super(MqttSensor, self).subscribe(topic=command_topic, qos=2)
+            if FunctionCodes.WRITE_MEMORY_SINGLE.value in variable.function_codes or \
+               FunctionCodes.WRITE_STATUS_REGISTER.value in variable.function_codes:
+                if key in self.subscribed_names:
+                    continue
+                self.subscribed_names.add(key)
+                platform = self.get_platform(variable)
+                command_topic = self.get_command_topic(variable)
+                print(f"Subscribing to homeassistant commands for {platform} {variable.name}")
+                await super().subscribe(topic=command_topic, qos=2)
     
-    async def get_commands(self) -> ResultContainer:
-        for message in await self.messages:
-            match = re.match(rf"^{self.base_topic}/\w+/{self.sensor_name}/(\w+)/", message.topic)
-            variable_name = match.group(1)
-            variable = variables[variable_name]
-            yield Result(**vars(variable), value=message.payload)
+    async def get_command(self) -> Result:
+        message = await anext(self.messages)
+        match = re.match(rf"^{self.base_topic}/\w+/{self.sensor_name}/(\w+)/", message.topic.value)
+        variable_name = match.group(1)
+        variable = variables[variable_name]
+        value = str(message.payload, encoding="utf8")
+        return Result(**vars(variable), value=value)

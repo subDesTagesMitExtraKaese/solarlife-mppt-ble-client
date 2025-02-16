@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import signal
+import traceback
 
 import aiomqtt
 from bleak import BleakScanner
@@ -29,8 +30,10 @@ async def subscribe_and_watch_switches(sensor: MqttSensor, mppt: BleClient):
     variable_container = VariableContainer([variable])
     await sensor.subscribe(variable_container)
     await sensor.store_config(variable_container)
-    for command in await sensor.get_commands():
-        results = mppt.write([command])
+    while True:
+        command = await sensor.get_command()
+        print(f"Received command to set {command.name} to '{command.value}'")
+        results = await mppt.write([command])
         await sensor.publish(results)
 
 async def run_mppt(sensor: MqttSensor, address: str):
@@ -44,7 +47,8 @@ async def run_mppt(sensor: MqttSensor, address: str):
                 await asyncio.sleep(request_interval)
                 if not task.cancelled() and task.exception:
                     break
-
+    except asyncio.TimeoutError:
+        print("BLE communication timed out")
     except BleakDeviceNotFoundError:
         print(f"BLE device with address {address} was not found")
     except BleakError as e:
@@ -70,7 +74,7 @@ async def run_mqtt(address, host, port, username, password):
         except asyncio.CancelledError:
             raise  # Re-raise the CancelledError to stop the task
         except Exception as e:
-            print(f"An error occurred during BLE communication: {e}")
+            print(traceback.format_exc())
         await asyncio.sleep(reconnect_interval)
 
 async def main(*args):
