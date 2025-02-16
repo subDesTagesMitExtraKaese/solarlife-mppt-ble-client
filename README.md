@@ -8,7 +8,7 @@ The application establishes a connection to the MQTT broker and the BLE device, 
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.10+
 - [Bleak](https://github.com/hbldh/bleak) - A BLE library for Python
 - [aiomqtt](https://github.com/sbtinstruments/aiomqtt) - A MQTT library for Python
 
@@ -29,6 +29,8 @@ The application establishes a connection to the MQTT broker and the BLE device, 
 3. Install the required Python packages using pip:
 
    ```bash
+   python -m venv venv
+   source venv/bin/activate
    pip install -r requirements.txt
    ```
 
@@ -52,24 +54,19 @@ The application publishes the data to MQTT topics in the following format:
 
 - Sensor state topic: `homeassistant/sensor/solarlife/<key>/state`
 - Sensor configuration topic (MQTT Discovery): `homeassistant/sensor/solarlife/<key>/config`
+- Switch command topic: `homeassistant/switch/solarlife/<key>/command`
 
 The `<key>` represents the data field from the charge controller. For example, `battery_percentage`, `battery_voltage`, etc.
 
 ## HomeAssistant Integration
 
-To integrate the published data into HomeAssistant, you can use the MQTT integration and configure it to subscribe to the MQTT topics published by the BLE client.
+To integrate the published data into HomeAssistant, you have to enable the mqtt platform. The device is discovered automatically.
 
 Here's an example configuration in HomeAssistant's `configuration.yaml` file:
 
 ```yaml
-sensor:
-  - platform: mqtt
-    name: "Solarlife Battery Percentage"
-    state_topic: "homeassistant/sensor/solarlife/battery_percentage/state"
-    unit_of_measurement: "%"
+mqtt: {}
 ```
-
-Replace `state_topic` with the appropriate MQTT topic for each sensor field you want to display.
 
 ## Contributing
 
