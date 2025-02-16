@@ -27,14 +27,18 @@ class BleClient(LumiaxClient):
         await self.client.stop_notify(self.NOTIFY_UUID)  # Stop receiving notifications
         await self.client.disconnect()  # Disconnect from the BLE device
 
-    async def notification_handler(self, characteristic: BleakGATTCharacteristic, data: bytearray):
+    def notification_handler(self, characteristic: BleakGATTCharacteristic, data: bytearray):
         if characteristic.uuid != self.NOTIFY_UUID:
             return
         self.buffer += data  # Append the received data to the buffer
-        if not self.is_complete(self.buffer):
-            return
-        results = self.parse(self.start_address, self.buffer)
-        self.response_queue.put_nowait(results)
+        try:
+            if not self.is_complete(self.buffer):
+                return
+            results = self.parse(self.start_address, self.buffer)
+            self.response_queue.put_nowait(results)
+        except Exception as e:
+            print(f"Response from device: 0x{self.buffer.hex()}")
+            print(f"Error while parsing response: {e}")
 
     async def read(self, start_address: int, count: int, repeat = 10, timeout = 5) -> ResultContainer:
         async with self.lock:
@@ -43,15 +47,16 @@ class BleClient(LumiaxClient):
             self.response_queue = asyncio.Queue() # Clear the queue
             i = 0
             # send the command multiple times
-            while self.response_queue.empty() and i < repeat:
+            while i < repeat:
                 i += 1
+                self.buffer = bytearray()
                 await self.client.write_gatt_char(self.WRITE_UUID, command)
                 try:
                     # Wait for either a response or timeout
                     return await asyncio.wait_for(self.response_queue.get(), timeout=timeout)
                 except asyncio.TimeoutError:
-                    pass
-            return None
+                    print(f"Repeating read command...")
+            return ResultContainer([])
 
     async def request_details(self) -> ResultContainer:
         return await self.read(0x3030, 43)
@@ -59,19 +64,22 @@ class BleClient(LumiaxClient):
     async def write(self, results: list[Result], repeat = 10, timeout = 5) -> ResultContainer:
         async with self.lock:
             start_address, command = self.get_write_command(0xFE, results)
+            self.start_address = start_address
             self.response_queue = asyncio.Queue() # Clear the queue
             i = 0
             # send the command multiple times
-            while self.response_queue.empty() and i < repeat:
+            while i < repeat:
                 i += 1
+                self.buffer = bytearray()
                 await self.client.write_gatt_char(self.WRITE_UUID, command)
+                print(f"Wrote command 0x{command.hex()}")
                 try:
                     # Wait for either a response or timeout
                     await asyncio.wait_for(self.response_queue.get(), timeout=timeout)
-                    return results
+                    return ResultContainer(results)
                 except asyncio.TimeoutError:
-                    pass
-            return None
+                    print(f"Repeating write command...")
+            return ResultContainer([])
 
     async def get_device_name(self):
         device_name = await self.client.read_gatt_char(self.DEVICE_NAME_UUID)  # Read the device name from the BLE device

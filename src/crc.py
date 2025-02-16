@@ -1,4 +1,4 @@
-def crc16(data):
+def crc16(data: bytes) -> bytes:
     crc = 0xFFFF
     for n in range(len(data)):
         crc ^= data[n]
