@@ -47,12 +47,17 @@ async def run_mppt(sensor: MqttSensor, address: str):
                 await asyncio.sleep(request_interval)
                 if not task.cancelled() and task.exception:
                     break
+    except EOFError:
+        pass
     except asyncio.TimeoutError:
         print("BLE communication timed out")
+        return
     except BleakDeviceNotFoundError:
         print(f"BLE device with address {address} was not found")
+        return
     except BleakError as e:
         print(f"BLE error occurred: {e}")
+        return
     finally:
         if task:
             task.cancel()
@@ -60,6 +65,7 @@ async def run_mppt(sensor: MqttSensor, address: str):
                 await task
             except asyncio.CancelledError:
                 pass
+    print("BLE device disconnected")
 
 async def run_mqtt(address, host, port, username, password):
     while True:
