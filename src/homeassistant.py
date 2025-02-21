@@ -112,7 +112,10 @@ class MqttSensor(Client):
             elif "timing_period" in key or "delay" in key or "total_light_time" in key:
                 payload['device_class'] = "duration"
 
-            if variable.binary_payload:
+            if platform == "button":
+                on, off = variable.binary_payload
+                payload["payload_press"] = on
+            elif variable.binary_payload:
                 on, off = variable.binary_payload
                 payload["payload_on"] = on
                 payload["payload_off"] = off

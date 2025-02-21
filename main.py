@@ -27,6 +27,7 @@ async def request_and_publish_details(sensor: MqttSensor, mppt: BleClient) -> No
 async def subscribe_and_watch(sensor: MqttSensor, mppt: BleClient):
     parameters = battery_and_load_parameters[:12] + switches
     await sensor.subscribe(parameters)
+    await sensor.store_config(switches)
     while True:
         command = await sensor.get_command()
         print(f"Received command to set {command.name} to '{command.value}'")
