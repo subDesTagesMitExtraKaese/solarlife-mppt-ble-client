@@ -80,7 +80,10 @@ class LumiaxClient:
             if raw_value == None:
                 raise Exception(f"invalid value for {variable.name}: '{value}'")
         elif variable.binary_payload and value == variable.binary_payload[0]:
-            raw_value = 0xFF00
+            if FunctionCodes.WRITE_STATUS_REGISTER.value in variable.function_codes:
+                raw_value = 0xFF00
+            else:
+                raw_value = 1
         elif variable.binary_payload and value == variable.binary_payload[1]:
             raw_value = 0
         elif variable.binary_payload:
@@ -190,7 +193,6 @@ class LumiaxClient:
             return len(buffer) >= 8
 
     def parse(self, start_address: int, buffer: bytes) -> ResultContainer:
-        self.device_id = buffer[0]
         function_code = FunctionCodes(buffer[1])
         results = []
         if function_code in [FunctionCodes.READ_MEMORY, FunctionCodes.READ_PARAMETER, FunctionCodes.READ_STATUS_REGISTER]:
@@ -222,7 +224,7 @@ class LumiaxClient:
                 variable = [v for v in variables if address == v.address and function_code.value in v.function_codes][0]
                 value = self.bytes_to_value(variable, buffer, 4)
                 results.append(Result(**vars(variable), value=value))
-
+        self.device_id = buffer[0]
         return ResultContainer(results)
 
     def _find_raw_value_by_brute_force(self, variable: Variable, value: str):
