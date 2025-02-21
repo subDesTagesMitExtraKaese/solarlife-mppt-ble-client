@@ -28,7 +28,7 @@ async def request_and_publish_details(sensor: MqttSensor, address: str) -> None:
                     await sensor.publish(details)
                 else:
                     print("No values recieved")
-        except (EOFError, BleakError, asyncio.TimeoutError) as e:
+        except (BleakError, asyncio.TimeoutError) as e:
             print(f"Got {type(e).__name__} while fetching details: {e}")
 
 async def request_and_publish_parameters(sensor: MqttSensor, address: str) -> None:
@@ -66,7 +66,7 @@ async def run_mppt(sensor: MqttSensor, address: str):
             await asyncio.sleep(request_interval)
             if task.done() and task.exception():
                 break
-    except (EOFError, asyncio.TimeoutError, BleakDeviceNotFoundError, BleakError) as e:
+    except (asyncio.TimeoutError, BleakDeviceNotFoundError, BleakError) as e:
         print(f"{type(e).__name__} occurred: {e}")
     finally:
         task.cancel()

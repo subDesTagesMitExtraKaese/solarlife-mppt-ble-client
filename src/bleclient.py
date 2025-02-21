@@ -26,8 +26,10 @@ class BleClient(LumiaxClient):
 
     async def __aexit__(self, exc_type, exc, tb):
         await self.client.stop_notify(self.NOTIFY_UUID)  # Stop receiving notifications
-        await self.client.disconnect()  # Disconnect from the BLE device
-
+        try:
+            await self.client.disconnect()  # Disconnect from the BLE device
+        except EOFError:
+            pass
     def notification_handler(self, characteristic: BleakGATTCharacteristic, data: bytearray):
         if characteristic.uuid != self.NOTIFY_UUID:
             return
