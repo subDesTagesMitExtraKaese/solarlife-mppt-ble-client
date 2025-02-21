@@ -75,8 +75,8 @@ class MqttSensor(Client):
             payload = {
                 "name": variable.friendly_name,
                 "device": self.device_info,
-                "object_id": key,
-                "unique_id": f"solarlife_{key}",
+                "object_id": f"{self.sensor_name}_{key}",
+                "unique_id": f"{self.sensor_name}_{key}",
                 "state_topic": state_topic,
             }
 
