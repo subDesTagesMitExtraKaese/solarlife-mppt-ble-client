@@ -17,6 +17,7 @@ class BleClient(LumiaxClient):
         self.client = BleakClient(mac_address)
         self.response_queue = asyncio.Queue()
         self.lock = asyncio.Lock()
+        super().__init__()
 
     async def __aenter__(self):
         await self.client.connect()  # Connect to the BLE device
@@ -40,7 +41,7 @@ class BleClient(LumiaxClient):
             print(f"Response from device: 0x{self.buffer.hex()}")
             print(f"Error while parsing response: {e}")
 
-    async def read(self, start_address: int, count: int, repeat = 10, timeout = 5) -> ResultContainer:
+    async def read(self, start_address: int, count: int, repeat = 10, timeout = 2) -> ResultContainer:
         async with self.lock:
             self.start_address = start_address
             command = self.get_read_command(0xFE, start_address, count)

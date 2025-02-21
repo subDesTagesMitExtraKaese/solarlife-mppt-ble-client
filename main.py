@@ -16,56 +16,67 @@ from src.variables import variables, VariableContainer, battery_and_load_paramet
 request_interval = 20   # In seconds
 reconnect_interval = 5  # In seconds
 
-async def request_and_publish_details(sensor: MqttSensor, mppt: BleClient) -> None:
-    details = await mppt.request_details()
-    if details:
-        print(f"Battery: {details['battery_percentage'].value}% ({details['battery_voltage'].value}V)")
-        await sensor.publish(details)
-    else:
-        print("No values recieved")
+ble_lock = asyncio.Lock()
 
-async def subscribe_and_watch(sensor: MqttSensor, mppt: BleClient):
+async def request_and_publish_details(sensor: MqttSensor, address: str) -> None:
+    async with ble_lock:
+        try:
+            async with BleClient(address) as mppt:
+                details = await mppt.request_details()
+                if details:
+                    print(f"Battery: {details['battery_percentage'].value}% ({details['battery_voltage'].value}V)")
+                    await sensor.publish(details)
+                else:
+                    print("No values recieved")
+        except (EOFError, BleakError, asyncio.TimeoutError) as e:
+            print(f"Got {type(e).__name__} while fetching details: {e}")
+
+async def request_and_publish_parameters(sensor: MqttSensor, address: str) -> None:
+    async with ble_lock:
+        async with BleClient(address) as mppt:
+            parameters = await mppt.request_parameters()
+            if parameters:
+                await sensor.publish(parameters)
+
+async def subscribe_and_watch(sensor: MqttSensor, address: str):
     parameters = battery_and_load_parameters[:12] + switches
     await sensor.subscribe(parameters)
     await sensor.store_config(switches)
+
     while True:
         command = await sensor.get_command()
         print(f"Received command to set {command.name} to '{command.value}'")
-        results = await mppt.write([command])
-        await sensor.publish(results)
+        async with ble_lock:
+            try:
+                async with BleClient(address) as mppt:
+                    results = await mppt.write([command])
+                    await sensor.publish(results)
+            except (BleakError, asyncio.TimeoutError) as e:
+                print(f"Get {type(e).__name__} while writing command: {e}")
+
 
 async def run_mppt(sensor: MqttSensor, address: str):
-    task = None
     loop = asyncio.get_event_loop()
+    task = loop.create_task(subscribe_and_watch(sensor, address))
+
     try:
-        async with BleClient(address) as mppt:
-            task = loop.create_task(subscribe_and_watch(sensor, mppt))
-            parameters = await mppt.request_parameters()
-            await sensor.publish(parameters)
-            while True:
-                await request_and_publish_details(sensor, mppt)
-                await asyncio.sleep(request_interval)
-                if not task.cancelled() and task.exception:
-                    break
-    except EOFError:
-        pass
-    except asyncio.TimeoutError:
-        print("BLE communication timed out")
-        return
-    except BleakDeviceNotFoundError:
-        print(f"BLE device with address {address} was not found")
-        return
-    except BleakError as e:
-        print(f"BLE error occurred: {e}")
-        return
+        await request_and_publish_parameters(sensor, address)
+        while True:
+            await request_and_publish_details(sensor, address)
+            await asyncio.sleep(request_interval)
+            if task.done() and task.exception():
+                break
+    except (EOFError, asyncio.TimeoutError, BleakDeviceNotFoundError, BleakError) as e:
+        print(f"{type(e).__name__} occurred: {e}")
     finally:
-        if task:
-            task.cancel()
-            try:
-                await task
-            except asyncio.CancelledError:
-                pass
-    print("BLE device disconnected")
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
+
+    print("BLE session ended.")
+
 
 async def run_mqtt(address, host, port, username, password):
     while True:
