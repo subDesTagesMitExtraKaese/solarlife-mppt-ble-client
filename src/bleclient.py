@@ -66,7 +66,7 @@ class BleClient(LumiaxClient):
     
     async def write(self, results: list[Result], repeat = 10, timeout = 5) -> ResultContainer:
         async with self.lock:
-            start_address, command = self.get_write_command(0xFE, results)
+            start_address, command = self.get_write_command(self.device_id, results)
             self.start_address = start_address
             self.response_queue = asyncio.Queue() # Clear the queue
             i = 0
