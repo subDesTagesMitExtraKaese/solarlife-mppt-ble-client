@@ -55,6 +55,8 @@ class BleClient(LumiaxClient):
                     # Wait for either a response or timeout
                     return await asyncio.wait_for(self.response_queue.get(), timeout=timeout)
                 except asyncio.TimeoutError:
+                    if self.buffer:
+                        print(f"Got partial response: 0x{self.buffer.hex()}")
                     print(f"Repeating read command...")
             return ResultContainer([])
 
@@ -64,7 +66,7 @@ class BleClient(LumiaxClient):
     async def request_parameters(self) -> ResultContainer:
         return await self.read(0x9021, 12)
     
-    async def write(self, results: list[Result], repeat = 10, timeout = 5) -> ResultContainer:
+    async def write(self, results: list[Result], repeat = 10, timeout = 2) -> ResultContainer:
         async with self.lock:
             start_address, command = self.get_write_command(self.device_id, results)
             self.start_address = start_address
@@ -81,6 +83,8 @@ class BleClient(LumiaxClient):
                     await asyncio.wait_for(self.response_queue.get(), timeout=timeout)
                     return ResultContainer(results)
                 except asyncio.TimeoutError:
+                    if self.buffer:
+                        print(f"Got partial response: 0x{self.buffer.hex()}")
                     print(f"Repeating write command...")
             return ResultContainer([])
 
