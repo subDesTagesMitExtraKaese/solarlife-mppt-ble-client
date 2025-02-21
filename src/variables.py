@@ -390,7 +390,7 @@ switches = VariableContainer([
     Variable(0x0008, False, False, [0x05], "", 0, "restore_system_default_values", "Restore system default values", None, ("Restore", "")),
     Variable(0x0009, False, False, [0x05], "", 0, "clear_device_statistics", "Clear running days, Power generation or consumption WH and historical minimum/maximum voltage", None, ("Clear", "")),
     Variable(0x000A, False, False, [0x05], "", 0, "clear_counters", "Clear all protection and fully charged times", None, ("Clear", "")),
-    Variable(0x000B, False, False, [0x05], "", 0, "Clear_charge_discharge_ah", "Clear charge/discharge AH", None, ("Clear", "")),
+    Variable(0x000B, False, False, [0x05], "", 0, "clear_charge_discharge_ah", "Clear charge/discharge AH", None, ("Clear", "")),
     Variable(0x000C, False, False, [0x05], "", 0, "clear_all", "Clear all of the above historical data", None, ("Clear", "")),
 ])
 
