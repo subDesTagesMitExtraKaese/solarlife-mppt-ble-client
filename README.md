@@ -8,7 +8,7 @@ The application establishes a connection to the MQTT broker and the BLE device, 
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.12+
 - [Bleak](https://github.com/hbldh/bleak) - A BLE library for Python
 - [aiomqtt](https://github.com/sbtinstruments/aiomqtt) - A MQTT library for Python
 
