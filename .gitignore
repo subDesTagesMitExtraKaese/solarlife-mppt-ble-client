@@ -1,3 +1,18 @@
 *.pyc
 venv/
+.venv/
 .venv-local/
+
+# ESPHome build output and local secrets
+esphome/.esphome/
+esphome/secrets.yaml
+
+__pycache__/
+
+# analysis captures from esphome/tools/capture.py
+captures/
+# capture files written outside captures/
+mppt-*.ndjson
+
+# ESPHome recreates its boilerplate ignore file on build
+/esphome/.gitignore
