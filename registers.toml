@@ -2,6 +2,10 @@
 #
 # Read directly by src/registers.py and converted into the ESPHome C++ table and
 # entity package by esphome/tools/gen_registers.py.
+#
+# Units are Home Assistant symbols so both clients publish entities HA accepts:
+# V, A, W, kWh, °C, %, s, min, h, d, Bd. Values without a meaningful unit stay
+# empty; calendar fields such as the RTC month and year have none.
 
 [[register]]
 address = 0x2000
@@ -1537,7 +1541,7 @@ group = "device_parameters"
 name = "real_time_clock_second"
 friendly_name = "Real-time clock second"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "ss" }
+format = { kind = "number", unit = "s" }
 
 [[register]]
 address = 0x9018
@@ -1545,7 +1549,7 @@ group = "device_parameters"
 name = "real_time_clock_minute"
 friendly_name = "Real-time clock minute"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "mm" }
+format = { kind = "number", unit = "min" }
 
 [[register]]
 address = 0x9019
@@ -1553,7 +1557,7 @@ group = "device_parameters"
 name = "real_time_clock_hour"
 friendly_name = "Real-time clock hour"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "hh" }
+format = { kind = "number", unit = "h" }
 
 [[register]]
 address = 0x901A
@@ -1561,7 +1565,7 @@ group = "device_parameters"
 name = "real_time_clock_day"
 friendly_name = "Real-time clock day"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "dd" }
+format = { kind = "number", unit = "d" }
 
 [[register]]
 address = 0x901B
@@ -1569,7 +1573,7 @@ group = "device_parameters"
 name = "real_time_clock_month"
 friendly_name = "Real-time clock month"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "MM" }
+format = { kind = "number" }
 
 [[register]]
 address = 0x901C
@@ -1577,7 +1581,7 @@ group = "device_parameters"
 name = "real_time_clock_year"
 friendly_name = "Real-time clock year (00-99)"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "yy" }
+format = { kind = "number" }
 
 [[register]]
 address = 0x901D
@@ -1585,7 +1589,7 @@ group = "device_parameters"
 name = "baud_rate"
 friendly_name = "Baud rate"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "enum", unit = "baud", shift = 0, mask = 0xF, labels = ["4800", "9600", "19200", "57600", "115200"] }
+format = { kind = "enum", unit = "Bd", shift = 0, mask = 0xF, labels = ["4800", "9600", "19200", "57600", "115200"] }
 
 [[register]]
 address = 0x901E
@@ -1729,7 +1733,7 @@ group = "battery_and_load_parameters"
 name = "timed_start_time_1_seconds"
 friendly_name = "Timed start time 1-seconds"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "sec" }
+format = { kind = "number", unit = "s" }
 
 [[register]]
 address = 0x9030
@@ -1745,7 +1749,7 @@ group = "battery_and_load_parameters"
 name = "timed_start_time_1_hours"
 friendly_name = "Timed start time 1-hour"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "hour" }
+format = { kind = "number", unit = "h" }
 
 [[register]]
 address = 0x9032
@@ -1753,7 +1757,7 @@ group = "battery_and_load_parameters"
 name = "timed_off_time_1_seconds"
 friendly_name = "Timed off time 1-seconds"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "sec" }
+format = { kind = "number", unit = "s" }
 
 [[register]]
 address = 0x9033
@@ -1769,7 +1773,7 @@ group = "battery_and_load_parameters"
 name = "timed_off_time_1_hours"
 friendly_name = "Timed off time 1-hour"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "hour" }
+format = { kind = "number", unit = "h" }
 
 [[register]]
 address = 0x9035
@@ -1777,7 +1781,7 @@ group = "battery_and_load_parameters"
 name = "timed_start_time_2_seconds"
 friendly_name = "Timed start time 2-seconds"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "sec" }
+format = { kind = "number", unit = "s" }
 
 [[register]]
 address = 0x9036
@@ -1793,7 +1797,7 @@ group = "battery_and_load_parameters"
 name = "timed_start_time_2_hours"
 friendly_name = "Timed start time 2-hour"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "hour" }
+format = { kind = "number", unit = "h" }
 
 [[register]]
 address = 0x9038
@@ -1801,7 +1805,7 @@ group = "battery_and_load_parameters"
 name = "timed_off_time_2_seconds"
 friendly_name = "Timed off time 2-seconds"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "sec" }
+format = { kind = "number", unit = "s" }
 
 [[register]]
 address = 0x9039
@@ -1817,7 +1821,7 @@ group = "battery_and_load_parameters"
 name = "timed_off_time_2_hours"
 friendly_name = "Timed off time 2-hour"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "hour" }
+format = { kind = "number", unit = "h" }
 
 [[register]]
 address = 0x903B
@@ -1897,7 +1901,7 @@ group = "battery_and_load_parameters"
 name = "dc_series_time_3"
 friendly_name = "DC Series time 3"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "sec", divisor = 0.03333333333333333 }
+format = { kind = "number", unit = "s", divisor = 0.03333333333333333 }
 
 [[register]]
 address = 0x9045
@@ -1913,7 +1917,7 @@ group = "battery_and_load_parameters"
 name = "dc_series_time_4"
 friendly_name = "DC Series time 4"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "sec", divisor = 0.03333333333333333 }
+format = { kind = "number", unit = "s", divisor = 0.03333333333333333 }
 
 [[register]]
 address = 0x9047
@@ -1929,7 +1933,7 @@ group = "battery_and_load_parameters"
 name = "dc_series_time_5"
 friendly_name = "DC Series time 5"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "sec", divisor = 0.03333333333333333 }
+format = { kind = "number", unit = "s", divisor = 0.03333333333333333 }
 
 [[register]]
 address = 0x9049
@@ -1977,7 +1981,7 @@ group = "battery_and_load_parameters"
 name = "sensing_delay_off_time"
 friendly_name = "Sensing delay off time"
 function_codes = [0x03, 0x06, 0x10]
-format = { kind = "number", unit = "sec", divisor = 0.1 }
+format = { kind = "number", unit = "s", divisor = 0.1 }
 
 [[register]]
 address = 0x904F
