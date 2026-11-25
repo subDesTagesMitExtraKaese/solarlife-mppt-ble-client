@@ -150,7 +150,9 @@ class RegisterContainer:
         self._register_map = {}
         for register in registers:
             current = self._register_map.get(register.name)
-            if current is None or _lookup_priority(register) < _lookup_priority(current):
+            if current is None or _lookup_priority(register) < _lookup_priority(
+                current
+            ):
                 self._register_map[register.name] = register
 
     def __getitem__(self, key: int | str | slice) -> Register:
@@ -161,7 +163,9 @@ class RegisterContainer:
         elif isinstance(key, slice):
             return RegisterContainer(self._registers[key])
         else:
-            raise TypeError("Key must be an integer index, a register name string, or a slice.")
+            raise TypeError(
+                "Key must be an integer index, a register name string, or a slice."
+            )
 
     def __len__(self):
         return len(self._registers)

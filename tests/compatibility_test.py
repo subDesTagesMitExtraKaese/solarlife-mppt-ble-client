@@ -1,4 +1,3 @@
-
 import sys
 import unittest
 
@@ -35,7 +34,12 @@ class TestCompat(unittest.TestCase):
             "load_total_energy",
         ]
         for name in names:
-            self.assertIn(name, [register.name for register in registers], f"register {name} doesn't exist anymore")
+            self.assertIn(
+                name,
+                [register.name for register in registers],
+                f"register {name} doesn't exist anymore",
+            )
+
     def test_excludes_names(self):
         bad_names = [
             "battery_full_level",
@@ -46,7 +50,11 @@ class TestCompat(unittest.TestCase):
             "temperature_2",
         ]
         for name in bad_names:
-            self.assertNotIn(name, [register.name for register in registers], f"register {name} still exists")
+            self.assertNotIn(
+                name,
+                [register.name for register in registers],
+                f"register {name} still exists",
+            )
 
     def test_units(self):
         unit_mapping = {

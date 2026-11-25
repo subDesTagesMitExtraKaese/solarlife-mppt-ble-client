@@ -43,14 +43,16 @@ class MqttSensor(Client):
     def get_config_topic(self, register: Register) -> str:
         platform = self.get_platform(register)
         return f"{self.base_topic}/{platform}/{self.sensor_name}/{register.name}/config"
-    
+
     def get_state_topic(self, register: Register) -> str:
         platform = self.get_platform(register)
         return f"{self.base_topic}/{platform}/{self.sensor_name}/{register.name}/state"
 
     def get_command_topic(self, register: Register) -> str:
         platform = self.get_platform(register)
-        return f"{self.base_topic}/{platform}/{self.sensor_name}/{register.name}/command"
+        return (
+            f"{self.base_topic}/{platform}/{self.sensor_name}/{register.name}/command"
+        )
 
     async def store_config(self, registers: RegisterContainer) -> None:
         # Publish each item in the results to its own MQTT topic
@@ -79,33 +81,33 @@ class MqttSensor(Client):
                 payload["unit_of_measurement"] = register.unit
                 payload["mode"] = "box"
                 payload["min"] = 0
-                
+
             if "daily" in key and "Wh" in register.unit:
-                payload['device_class'] = "energy"
-                payload['state_class'] = "total_increasing"
+                payload["device_class"] = "energy"
+                payload["state_class"] = "total_increasing"
             elif "total" in key and "Wh" in register.unit:
-                payload['device_class'] = "energy"
-                payload['state_class'] = "total"
+                payload["device_class"] = "energy"
+                payload["state_class"] = "total"
             elif "Wh" in register.unit:
-                payload['device_class'] = "energy"
-                payload['state_class'] = "measurement"
+                payload["device_class"] = "energy"
+                payload["state_class"] = "measurement"
             elif "V" in register.unit:
-                payload['device_class'] = "voltage"
-                payload['state_class'] = "measurement"
+                payload["device_class"] = "voltage"
+                payload["state_class"] = "measurement"
             elif "A" in register.unit:
-                payload['device_class'] = "current"
-                payload['state_class'] = "measurement"
+                payload["device_class"] = "current"
+                payload["state_class"] = "measurement"
             elif "W" in register.unit:
-                payload['device_class'] = "power"
-                payload['state_class'] = "measurement"
+                payload["device_class"] = "power"
+                payload["state_class"] = "measurement"
             elif "°C" in register.unit:
-                payload['device_class'] = "temperature"
-                payload['state_class'] = "measurement"
+                payload["device_class"] = "temperature"
+                payload["state_class"] = "measurement"
             elif key == "battery_percentage":
-                payload['device_class'] = "battery"
-                payload['state_class'] = "measurement"
+                payload["device_class"] = "battery"
+                payload["state_class"] = "measurement"
             elif "timing_period" in key or "delay" in key or "total_light_time" in key:
-                payload['device_class'] = "duration"
+                payload["device_class"] = "duration"
 
             if platform == "button":
                 payload["payload_press"] = register.payload_on
@@ -117,7 +119,9 @@ class MqttSensor(Client):
                 payload["command_topic"] = command_topic
 
             # Publish the MQTT Discovery payload
-            await super().publish(config_topic, payload=json.dumps(payload), retain=True)
+            await super().publish(
+                config_topic, payload=json.dumps(payload), retain=True
+            )
 
     async def publish(self, results: ResultContainer):
         await self.store_config(results)
@@ -125,7 +129,9 @@ class MqttSensor(Client):
         for result in results:
             state_topic = self.get_state_topic(result)
             # Publish the entity state
-            await super().publish(state_topic, payload=str(result.value), retain=result.is_writable)
+            await super().publish(
+                state_topic, payload=str(result.value), retain=result.is_writable
+            )
 
     async def subscribe(self, registers: RegisterContainer):
         for key, register in registers.items():
@@ -135,12 +141,16 @@ class MqttSensor(Client):
                 self.subscribed_names.add(key)
                 platform = self.get_platform(register)
                 command_topic = self.get_command_topic(register)
-                print(f"Subscribing to homeassistant commands for {platform} {register.name}")
+                print(
+                    f"Subscribing to homeassistant commands for {platform} {register.name}"
+                )
                 await super().subscribe(topic=command_topic, qos=2)
-    
+
     async def get_command(self) -> Result:
         message = await anext(self.messages)
-        match = re.match(rf"^{self.base_topic}/\w+/{self.sensor_name}/(\w+)/", message.topic.value)
+        match = re.match(
+            rf"^{self.base_topic}/\w+/{self.sensor_name}/(\w+)/", message.topic.value
+        )
         register_name = match.group(1)
         register = registers[register_name]
         value = str(message.payload, encoding="utf8")

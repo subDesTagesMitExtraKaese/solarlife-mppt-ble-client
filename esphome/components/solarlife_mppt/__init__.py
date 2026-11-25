@@ -6,7 +6,15 @@ from esphome.components import ble_client
 
 CODEOWNERS = ["@subDesTagesMitExtraKaese"]
 DEPENDENCIES = ["ble_client", "esp32_ble_tracker"]
-AUTO_LOAD = ["sensor", "number", "binary_sensor", "text_sensor", "select", "switch", "button"]
+AUTO_LOAD = [
+    "sensor",
+    "number",
+    "binary_sensor",
+    "text_sensor",
+    "select",
+    "switch",
+    "button",
+]
 MULTI_CONF = True
 
 DOMAIN = "solarlife_mppt"
@@ -35,8 +43,12 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_NOTIFY_UUID, default=0xFF01): cv.uint16_t,
             cv.Optional(CONF_WRITE_UUID, default=0xFF02): cv.uint16_t,
             cv.Optional(CONF_RETRIES, default=10): cv.int_range(min=0, max=10),
-            cv.Optional(CONF_TIMEOUT, default="2s"): cv.positive_time_period_milliseconds,
-            cv.Optional(CONF_PARAMETERS_INTERVAL, default="300s"): cv.positive_time_period_milliseconds,
+            cv.Optional(
+                CONF_TIMEOUT, default="2s"
+            ): cv.positive_time_period_milliseconds,
+            cv.Optional(
+                CONF_PARAMETERS_INTERVAL, default="300s"
+            ): cv.positive_time_period_milliseconds,
         }
     )
     .extend(ble_client.BLE_CLIENT_SCHEMA)

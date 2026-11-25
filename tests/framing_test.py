@@ -40,7 +40,7 @@ class TestFraming(unittest.TestCase):
     def test_frame_split_across_notifications(self):
         for index in range(0, len(FRAME), 20):
             self.assertEqual([], self.results())
-            self.feed(FRAME[index:index + 20])
+            self.feed(FRAME[index : index + 20])
         results = self.results()
         self.assertEqual(1, len(results))
         self.assertAlmostEqual(0.0, results[0]["load_current"].value)

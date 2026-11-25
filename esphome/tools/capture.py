@@ -96,7 +96,14 @@ class Capture:
         if self.last_states.get(state.key) == value:
             return
         self.last_states[state.key] = value
-        self.write({"type": "state", "ts": now(), "name": self.state_name(state.key), "value": value})
+        self.write(
+            {
+                "type": "state",
+                "ts": now(),
+                "name": self.state_name(state.key),
+                "value": value,
+            }
+        )
 
     def on_log(self, message) -> None:
         text = getattr(message, "message", b"")
@@ -118,14 +125,20 @@ class Capture:
             frame = FRAME.match(msg)
             if frame is not None:
                 start, fc, byte_count, length, raw = frame.groups()
-                self.write_frame(int(start, 16), int(fc, 16), int(byte_count), int(length), raw)
+                self.write_frame(
+                    int(start, 16), int(fc, 16), int(byte_count), int(length), raw
+                )
                 continue
 
             # Keep component logs plus warnings and errors; other lines are noise.
             if tag.startswith("solarlife_mppt") or level in ("W", "E"):
-                self.write({"type": "log", "ts": now(), "level": level, "tag": tag, "msg": msg})
+                self.write(
+                    {"type": "log", "ts": now(), "level": level, "tag": tag, "msg": msg}
+                )
 
-    def write_frame(self, start: int, fc: int, byte_count: int, length: int, raw: str) -> None:
+    def write_frame(
+        self, start: int, fc: int, byte_count: int, length: int, raw: str
+    ) -> None:
         hexes = raw.split()
         frame = bytes(int(value, 16) for value in hexes)
         event = {
@@ -144,23 +157,36 @@ class Capture:
         try:
             results = self.client.parse(start, frame)
         except (ProtocolError, ValueError, IndexError, struct.error) as error:
-            self.write({"type": "decode_error", "ts": now(), "raw": event["raw"], "error": str(error)})
+            self.write(
+                {
+                    "type": "decode_error",
+                    "ts": now(),
+                    "raw": event["raw"],
+                    "error": str(error),
+                }
+            )
             return
 
         event = {"type": "decoded", "ts": now(), "start": start}
         if self.register_addresses is None:
             # Names repeat in the register map; record once where this frame
             # takes each value from.
-            self.register_addresses = {result.name: f"{result.address:#06x}" for result in results}
+            self.register_addresses = {
+                result.name: f"{result.address:#06x}" for result in results
+            }
             event["registers"] = self.register_addresses
         event["values"] = {
-            result.name: round(result.value, 4) if isinstance(result.value, float) else result.value
+            result.name: round(result.value, 4)
+            if isinstance(result.value, float)
+            else result.value
             for result in results
         }
         self.write(event)
 
 
-async def run(host: str, port: int, capture: Capture, encryption_key: str | None) -> None:
+async def run(
+    host: str, port: int, capture: Capture, encryption_key: str | None
+) -> None:
     import asyncio
 
     stopped = asyncio.Event()
@@ -184,10 +210,24 @@ async def run(host: str, port: int, capture: Capture, encryption_key: str | None
     )
 
     entities, _ = await client.list_entities_services()
-    capture.names = {entity.key: getattr(entity, "name", str(entity.key)) for entity in entities}
-    capture.device_ids = {device.device_id for device in info.devices if "solarlife" in device.name.lower()}
+    capture.names = {
+        entity.key: getattr(entity, "name", str(entity.key)) for entity in entities
+    }
+    capture.device_ids = {
+        device.device_id
+        for device in info.devices
+        if "solarlife" in device.name.lower()
+    }
     if not capture.device_ids:
-        capture.write({"type": "log", "ts": now(), "level": "W", "tag": "capture", "msg": "no Solarlife sub-device found, recording all states"})
+        capture.write(
+            {
+                "type": "log",
+                "ts": now(),
+                "level": "W",
+                "tag": "capture",
+                "msg": "no Solarlife sub-device found, recording all states",
+            }
+        )
 
     client.subscribe_states(capture.on_state)
     client.subscribe_logs(capture.on_log, log_level=LogLevel.LOG_LEVEL_VERY_VERBOSE)
@@ -199,11 +239,19 @@ async def run(host: str, port: int, capture: Capture, encryption_key: str | None
 def main() -> None:
     import asyncio
 
-    parser = argparse.ArgumentParser(description="Record MPPT bridge frames and states as NDJSON")
+    parser = argparse.ArgumentParser(
+        description="Record MPPT bridge frames and states as NDJSON"
+    )
     parser.add_argument("--host", required=True, help="ESPHome bridge address")
     parser.add_argument("--port", type=int, default=6053, help="ESPHome API port")
-    parser.add_argument("--out-dir", default="captures", help="directory for the NDJSON files")
-    parser.add_argument("--encryption-key", default=None, help="API encryption key, if the bridge has one")
+    parser.add_argument(
+        "--out-dir", default="captures", help="directory for the NDJSON files"
+    )
+    parser.add_argument(
+        "--encryption-key",
+        default=None,
+        help="API encryption key, if the bridge has one",
+    )
     args = parser.parse_args()
 
     capture = Capture(Path(args.out_dir))
@@ -214,7 +262,11 @@ def main() -> None:
             break
         except (APIConnectionError, OSError, TimeoutError) as error:
             capture.write({"type": "disconnect", "ts": now(), "error": str(error)})
-            print(f"capture disconnected ({error}), retrying in 15s", file=sys.stderr, flush=True)
+            print(
+                f"capture disconnected ({error}), retrying in 15s",
+                file=sys.stderr,
+                flush=True,
+            )
             time.sleep(15)
 
 

@@ -180,14 +180,16 @@ def write_source(registers):
             f"{reg['digits']}, {reg['clamp']}"
             "},"
         )
-    lines.extend([
-        "};",
-        "",
-        "const size_t REGISTER_COUNT = sizeof(REGISTERS) / sizeof(REGISTERS[0]);",
-        "",
-        "}  // namespace esphome::solarlife_mppt",
-        "",
-    ])
+    lines.extend(
+        [
+            "};",
+            "",
+            "const size_t REGISTER_COUNT = sizeof(REGISTERS) / sizeof(REGISTERS[0]);",
+            "",
+            "}  // namespace esphome::solarlife_mppt",
+            "",
+        ]
+    )
     (COMPONENT / "registers.cpp").write_text("\n".join(lines))
 
 
@@ -232,7 +234,15 @@ def numeric_item(reg, writable):
 
 
 def write_package(registers):
-    sensors, binary_sensors, text_sensors, switches, buttons, numbers, selects = [], [], [], [], [], [], []
+    sensors, binary_sensors, text_sensors, switches, buttons, numbers, selects = (
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+    )
 
     for reg in registers:
         if not in_package(reg["address"]):
@@ -253,7 +263,11 @@ def write_package(registers):
                 switches.append(base + "\n    icon: mdi:toggle-switch")
             else:
                 options = "\n".join(f"      - {yaml_string(label)}" for label in labels)
-                selects.append(base + "\n    icon: mdi:format-list-bulleted\n    options:\n" + options)
+                selects.append(
+                    base
+                    + "\n    icon: mdi:format-list-bulleted\n    options:\n"
+                    + options
+                )
         elif kind in ("enum", "digits"):
             text_sensors.append(entity_base(reg, name))
         elif kind in ("number", "packed_time") and reg["is_writable"]:

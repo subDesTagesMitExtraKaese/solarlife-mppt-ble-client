@@ -8,4 +8,4 @@ def crc16(data: bytes) -> bytes:
                 crc ^= 0xA001
             else:
                 crc >>= 1
-    return crc.to_bytes(2, 'little')
+    return crc.to_bytes(2, "little")

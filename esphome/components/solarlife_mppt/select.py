@@ -21,7 +21,11 @@ SolarlifeMpptSelect = solarlife_mppt_ns.class_(
 
 CONFIG_SCHEMA = SOLARLIFE_MPPT_COMPONENT_SCHEMA.extend(
     select.select_schema(SolarlifeMpptSelect).extend(
-        {cv.Required(CONF_OPTIONS): cv.All(cv.ensure_list(cv.string_strict), cv.Length(min=1))}
+        {
+            cv.Required(CONF_OPTIONS): cv.All(
+                cv.ensure_list(cv.string_strict), cv.Length(min=1)
+            )
+        }
     )
 )
 
