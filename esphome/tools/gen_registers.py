@@ -39,7 +39,17 @@ DEVICE_CLASSES = {
     "kWh": "energy",
     "°C": "temperature",
 }
-STATE_CLASSES = {"kWh": "total_increasing"}
+# Read-only values that Home Assistant should keep long-term statistics for.
+# Without a state class the entity is not accepted as a statistics source.
+STATE_CLASSES = {
+    "V": "measurement",
+    "A": "measurement",
+    "W": "measurement",
+    "°C": "measurement",
+    "%": "measurement",
+    "min": "measurement",
+    "kWh": "total_increasing",
+}
 
 C_KINDS = {
     "number": "NUMBER",
@@ -193,15 +203,17 @@ def write_source(registers):
     (COMPONENT / "registers.cpp").write_text("\n".join(lines))
 
 
-def add_common_number_fields(item, reg, accuracy=True):
+def add_common_number_fields(item, reg, writable):
     unit = reg["unit"]
     if unit:
         item.append(f"    unit_of_measurement: {yaml_string(unit)}")
-        if accuracy:
+        if not writable:
             item.append(f"    accuracy_decimals: {decimals_for(reg['divisor'])}")
     if unit in DEVICE_CLASSES:
         item.append(f"    device_class: {DEVICE_CLASSES[unit]}")
-    if unit in STATE_CLASSES:
+    # Writable numbers are configuration values, not measurements, so they must
+    # not end up in the statistics recorder.
+    if not writable and unit in STATE_CLASSES:
         item.append(f"    state_class: {STATE_CLASSES[unit]}")
 
 
@@ -220,7 +232,7 @@ def entity_base(reg, name):
 
 def numeric_item(reg, writable):
     item = entity_base(reg, reg["friendly_name"]).splitlines()
-    add_common_number_fields(item, reg, accuracy=not writable)
+    add_common_number_fields(item, reg, writable)
     if writable:
         divisor = reg["divisor"]
         raw_max = 32767 if reg["is_signed"] else 65535

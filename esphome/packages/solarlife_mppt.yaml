@@ -24,6 +24,7 @@ sensor:
     unit_of_measurement: "V"
     accuracy_decimals: 2
     device_class: voltage
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -33,6 +34,7 @@ sensor:
     unit_of_measurement: "°C"
     accuracy_decimals: 2
     device_class: temperature
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -42,6 +44,7 @@ sensor:
     unit_of_measurement: "°C"
     accuracy_decimals: 2
     device_class: temperature
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -104,6 +107,7 @@ sensor:
     name: "Battery remaining capacity"
     unit_of_measurement: "%"
     accuracy_decimals: 0
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -113,6 +117,7 @@ sensor:
     unit_of_measurement: "V"
     accuracy_decimals: 2
     device_class: voltage
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -122,6 +127,7 @@ sensor:
     unit_of_measurement: "A"
     accuracy_decimals: 2
     device_class: current
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -131,6 +137,7 @@ sensor:
     unit_of_measurement: "W"
     accuracy_decimals: 2
     device_class: power
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -140,6 +147,7 @@ sensor:
     unit_of_measurement: "V"
     accuracy_decimals: 2
     device_class: voltage
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -149,6 +157,7 @@ sensor:
     unit_of_measurement: "A"
     accuracy_decimals: 2
     device_class: current
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -158,6 +167,7 @@ sensor:
     unit_of_measurement: "W"
     accuracy_decimals: 2
     device_class: power
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -167,6 +177,7 @@ sensor:
     unit_of_measurement: "V"
     accuracy_decimals: 2
     device_class: voltage
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -176,6 +187,7 @@ sensor:
     unit_of_measurement: "A"
     accuracy_decimals: 2
     device_class: current
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -185,6 +197,7 @@ sensor:
     unit_of_measurement: "W"
     accuracy_decimals: 2
     device_class: power
+    state_class: measurement
   - platform: solarlife_mppt
     solarlife_mppt_id: mppt
     device_id: solarlife
@@ -233,6 +246,7 @@ sensor:
     name: "Total light time during the day"
     unit_of_measurement: "min"
     accuracy_decimals: 0
+    state_class: measurement
 
 # number
 number:
