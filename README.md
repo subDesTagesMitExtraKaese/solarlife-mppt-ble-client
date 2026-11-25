@@ -1,10 +1,10 @@
 # Solarlife MPPT BLE Client
 
-This Python application connects to an X45, 10 A, MPPT solar charge controller via Bluetooth Low Energy (BLE). It reads the data from the charge controller and publishes it to HomeAssistant using MQTT.
+This Python application connects to an X45, 10 A, MPPT solar charge controller via Bluetooth Low Energy (BLE). It reads the data from the charge controller and publishes it to Home Assistant using MQTT.
 
-The application establishes a connection to the MQTT broker and the BLE device, retrieves the details from the charge controller periodically, and publishes the data to MQTT topics. HomeAssistant can then subscribe to these topics to display the data in its user interface.
+The application establishes a connection to the MQTT broker and the BLE device, retrieves the details from the charge controller periodically, and publishes the data to MQTT topics. Home Assistant can then subscribe to these topics to display the data in its user interface.
 
-![HomeAssistant Screenshot](/images/hass.png)
+![Home Assistant Screenshot](/images/hass.png)
 
 ## Requirements
 
@@ -46,23 +46,26 @@ The application establishes a connection to the MQTT broker and the BLE device, 
 
 2. The application will connect to the MQTT broker and the BLE device. It will periodically retrieve the data from the charge controller and publish it to MQTT topics.
 
-3. HomeAssistant can subscribe to the MQTT topics to display the published data in its user interface.
+3. Home Assistant can subscribe to the MQTT topics to display the published data in its user interface.
 
 ## MQTT Topics
 
-The application publishes the data to MQTT topics in the following format:
+The application publishes MQTT Discovery entries and state topics using this
+layout:
 
-- Sensor state topic: `homeassistant/sensor/solarlife/<key>/state`
-- Sensor configuration topic (MQTT Discovery): `homeassistant/sensor/solarlife/<key>/config`
-- Switch command topic: `homeassistant/switch/solarlife/<key>/command`
+- Configuration: `homeassistant/<platform>/solarlife/<key>/config`
+- State: `homeassistant/<platform>/solarlife/<key>/state`
+- Command, for writable values: `homeassistant/<platform>/solarlife/<key>/command`
 
-The `<key>` represents the data field from the charge controller. For example, `battery_percentage`, `battery_voltage`, etc.
+`<platform>` is selected from the register format. `<key>` is the register name
+from [`registers.toml`](registers.toml), for example `battery_percentage` or
+`battery_voltage`.
 
-## HomeAssistant Integration
+## Home Assistant Integration
 
-To integrate the published data into HomeAssistant, you have to enable the mqtt platform. The device is discovered automatically.
+To integrate the published data into Home Assistant, you have to enable the mqtt platform. The device is discovered automatically.
 
-Here's an example configuration in HomeAssistant's `configuration.yaml` file:
+Here's an example configuration in Home Assistant's `configuration.yaml` file:
 
 ```yaml
 mqtt: {}

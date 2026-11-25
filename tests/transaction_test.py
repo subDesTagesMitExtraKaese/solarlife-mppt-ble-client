@@ -1,9 +1,11 @@
-import unittest
 import sys
+import unittest
+
 sys.path.append("..")
 
-from src.variables import variables
 from src.protocol import LumiaxClient, Result
+from src.registers import registers
+
 
 class TestTransaction(unittest.TestCase):
 
@@ -130,9 +132,9 @@ class TestTransaction(unittest.TestCase):
 
         self.assertEqual(end_address - start_address + 1, count)
 
-        items = [v for v in variables if v.address >= start_address and v.address <= end_address]
+        items = [register for register in registers if register.address >= start_address and register.address <= end_address]
         values = ["Lithium", 10.6, 11.8, 14.4, 14.7, 13.6, "Auto", 14.4, 14.0, "Normal charging"]
-        results = [Result(**vars(variable), value=value) for variable, value in (zip(items, values))]
+        results = [Result(**vars(register), value=value) for register, value in zip(items, values)]
 
         send_buf = bytes([0x01, 0x10, 0x90, 0x21, 0x00, 0x0A, 0x14, 0x00, 0x00, 0x04, 0x24, 0x04, 0x9C, 0x05, 0xA0, 0x05, 0xBE, 0x05, 0x50, 0x00, 0x00, 0x05, 0xA0, 0x05, 0x78, 0x00, 0x00, 0xCC, 0xE7])
         start_address, data = self.client.get_write_command(device_id, results)
@@ -142,5 +144,25 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(len(recv_buf) - 4, 4)
         results = self.client.parse(start_address, recv_buf)
         self.assertListEqual(list(results), [])
+
+    def test_7(self):
+        # Captured from a real controller (12 V, load output enabled but unloaded).
+        recv_buf = bytes.fromhex(
+            "0104520001019E04B0000000200001083406400018000000"
+            "050000000000000000000000000000000000000000005505"
+            "23000000000000052800000000000000D200000000000000"
+            "010B580000000A134F0000050FEF1D"
+        )
+        results = self.client.parse(0x3030, recv_buf)
+        self.assertEqual(len(recv_buf) - 5, recv_buf[2])
+        self.assertAlmostEqual(results["battery_voltage"].value, 13.15)
+        self.assertAlmostEqual(results["battery_current"].value, 0.0)
+        self.assertAlmostEqual(results["load_voltage"].value, 13.2)
+        self.assertAlmostEqual(results["load_current"].value, 0.0)
+        self.assertAlmostEqual(results["load_power"].value, 0.0)
+        self.assertTrue(results["load_is_enabled"].value)
+        self.assertEqual("Light load", results["load_state"].value)
+        self.assertEqual(85.0, results["battery_percentage"].value)
+
 if __name__ == "__main__":
     unittest.main()

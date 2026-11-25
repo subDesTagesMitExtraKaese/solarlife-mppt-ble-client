@@ -1,10 +1,11 @@
-from itertools import groupby
 
-import unittest
 import sys
+import unittest
+
 sys.path.append("..")
 
-from src.variables import variables
+from src.registers import registers
+
 
 class TestCompat(unittest.TestCase):
     def test_includes_names(self):
@@ -34,7 +35,7 @@ class TestCompat(unittest.TestCase):
             "load_total_energy",
         ]
         for name in names:
-            self.assertIn(name, [v.name for v in variables], f"variable {name} doesn't exist anymore")
+            self.assertIn(name, [register.name for register in registers], f"register {name} doesn't exist anymore")
     def test_excludes_names(self):
         bad_names = [
             "battery_full_level",
@@ -45,7 +46,7 @@ class TestCompat(unittest.TestCase):
             "temperature_2",
         ]
         for name in bad_names:
-            self.assertNotIn(name, [v.name for v in variables], f"variable {name} still exists")
+            self.assertNotIn(name, [register.name for register in registers], f"register {name} still exists")
 
     def test_units(self):
         unit_mapping = {
@@ -65,6 +66,6 @@ class TestCompat(unittest.TestCase):
             "load_total_energy": "kWh",
         }
         for name, unit in unit_mapping.items():
-            items = [v for v in variables if name == v.name]
-            self.assertTrue(items, f"variable {name} doesn't exist anymore")
+            items = [register for register in registers if name == register.name]
+            self.assertTrue(items, f"register {name} doesn't exist anymore")
             self.assertEqual(items[0].unit, unit)

@@ -1,0 +1,2100 @@
+# Source of truth for the Lumiax register map.
+#
+# Read directly by src/registers.py and converted into the ESPHome C++ table and
+# entity package by esphome/tools/gen_registers.py.
+
+[[register]]
+address = 0x2000
+group = "real_time_status"
+name = "equipment_internal_over_temperature"
+friendly_name = "Equipment internal over temperature"
+function_codes = [0x02]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["Normal", "Over temperature"] }
+
+[[register]]
+address = 0x200C
+group = "real_time_status"
+name = "day_or_night"
+friendly_name = "Day or night"
+function_codes = [0x02]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["Day", "Night"] }
+
+[[register]]
+address = 0x3011
+group = "status_registers"
+name = "maximum_system_voltage_level"
+friendly_name = "Maximum system voltage level"
+function_codes = [0x04]
+format = { kind = "enum", shift = 12, mask = 0xF, labels = ["", "12V", "24V", "36V", "48V"] }
+
+[[register]]
+address = 0x3011
+group = "status_registers"
+name = "minimum_system_voltage_level"
+friendly_name = "Minimum system voltage level"
+function_codes = [0x04]
+format = { kind = "enum", shift = 8, mask = 0xF, labels = ["", "12V", "24V", "36V", "48V"] }
+
+[[register]]
+address = 0x3011
+group = "status_registers"
+name = "controller_series"
+friendly_name = "Controller Series"
+function_codes = [0x04]
+format = { kind = "enum", shift = 4, mask = 0xF, labels = ["MT series", "DC series", "SMR series"] }
+
+[[register]]
+address = 0x3011
+group = "status_registers"
+name = "battery_type"
+friendly_name = "Battery type"
+function_codes = [0x04]
+format = { kind = "enum", shift = 0, mask = 0xF, labels = ["Lithium battery", "Non Lithium battery"] }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "infrared_function_available"
+friendly_name = "Is infrared function available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 15 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "automatic_power_reduction_available"
+friendly_name = "Is automatic power reduction setting available(only in 365 mode)"
+function_codes = [0x04]
+format = { kind = "flag", shift = 14 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "charging_at_zero_celsius_available"
+friendly_name = "Is 0°C prohibit charging setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 13 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "grade_of_rated_voltage_available"
+friendly_name = "Is grade of rated voltage setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 12 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "overcharge_recovery_voltage_available"
+friendly_name = "Is overcharge recovery voltage setting available (only lithium battery)"
+function_codes = [0x04]
+format = { kind = "flag", shift = 11 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "overcharge_protection_available"
+friendly_name = "Is overcharge protection setting available (only lithium battery)"
+function_codes = [0x04]
+format = { kind = "flag", shift = 10 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "floating_charge_voltage_available"
+friendly_name = "Is floating charge voltage setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 9 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "equilibrium_charge_voltage_available"
+friendly_name = "Is equilibrium charge voltage setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 8 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "strong_charging_voltage_available"
+friendly_name = "Is strong charging voltage setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 7 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "low_voltage_recovery_voltage_available"
+friendly_name = "Is low voltage recovery setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 6 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "low_voltage_protection_voltage_available"
+friendly_name = "Is low voltage protection setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 5 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "battery_type_available"
+friendly_name = "Is Battery Type setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 4 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "backlight_time_available"
+friendly_name = "Is Backlight Time setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 3 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "device_time_available"
+friendly_name = "Is Device Time setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 2 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "device_id_available"
+friendly_name = "Is Device ID setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 1 }
+
+[[register]]
+address = 0x3012
+group = "status_registers"
+name = "device_password_available"
+friendly_name = "Is Device password setting available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 0 }
+
+[[register]]
+address = 0x3013
+group = "status_registers"
+name = "six_time_frame_mode_available"
+friendly_name = "Is Six Time Frame Mode available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 7 }
+
+[[register]]
+address = 0x3013
+group = "status_registers"
+name = "five_time_frame_mode_available"
+friendly_name = "Is Five Time Frame Mode available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 6 }
+
+[[register]]
+address = 0x3013
+group = "status_registers"
+name = "timing_control_mode_available"
+friendly_name = "Is Timing Control available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 5 }
+
+[[register]]
+address = 0x3013
+group = "status_registers"
+name = "t0t_mode_available"
+friendly_name = "Is T0T Mode available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 4 }
+
+[[register]]
+address = 0x3013
+group = "status_registers"
+name = "fixed_duration_mode_available"
+friendly_name = "Is Fixed Light Up Duration Mode available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 3 }
+
+[[register]]
+address = 0x3013
+group = "status_registers"
+name = "d2d_mode_available"
+friendly_name = "Is D2D Mode available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 2 }
+
+[[register]]
+address = 0x3013
+group = "status_registers"
+name = "24h_mode_available"
+friendly_name = "Is 24H Mode available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 1 }
+
+[[register]]
+address = 0x3013
+group = "status_registers"
+name = "manual_operation_mode_available"
+friendly_name = "Is Manual Operation Mode available"
+function_codes = [0x04]
+format = { kind = "flag", shift = 0 }
+
+[[register]]
+address = 0x3015
+group = "status_registers"
+name = "lvd_min_setting_value"
+friendly_name = "Low voltage detect min setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3016
+group = "status_registers"
+name = "lvd_max_setting_value"
+friendly_name = "Low voltage detect max setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3017
+group = "status_registers"
+name = "lvd_default_setting_value"
+friendly_name = "Low voltage detect default setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3018
+group = "status_registers"
+name = "lvr_min_setting_value"
+friendly_name = "Low voltage recovery min setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3019
+group = "status_registers"
+name = "lvr_max_setting_value"
+friendly_name = "Low voltage recovery max setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x301A
+group = "status_registers"
+name = "lvr_default_setting_value"
+friendly_name = "Low voltage recovery default setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x301B
+group = "status_registers"
+name = "cvt_min_setting_value"
+friendly_name = "Charge target voltage min setting value for Li Series controller"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x301C
+group = "status_registers"
+name = "cvt_max_setting_value"
+friendly_name = "Charge target voltage max setting value for Li Series controller"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x301D
+group = "status_registers"
+name = "cvt_default_setting_value"
+friendly_name = "Charge target voltage default setting value Li Series controller"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x301E
+group = "status_registers"
+name = "cvr_min_setting_value"
+friendly_name = "Charge recovery voltage min setting value Li Series controller"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x301F
+group = "status_registers"
+name = "cvr_max_setting_value"
+friendly_name = "Charge recovery voltage max setting value Li Series controller"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3020
+group = "status_registers"
+name = "cvr_default_setting_value"
+friendly_name = "Charge recovery voltage default setting value Li Series controller"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3021
+group = "status_registers"
+name = "day_night_threshold_voltage_min"
+friendly_name = "Day/Night threshold voltage min setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3022
+group = "status_registers"
+name = "day_night_threshold_voltage_max"
+friendly_name = "Day/Night threshold voltage max setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3023
+group = "status_registers"
+name = "day_night_threshold_voltage_default"
+friendly_name = "Day/Night threshold voltage default setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3024
+group = "status_registers"
+name = "dimming_voltage_min"
+friendly_name = "Dimming voltage min setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3025
+group = "status_registers"
+name = "dimming_voltage_max"
+friendly_name = "Dimming voltage max setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3026
+group = "status_registers"
+name = "dimming_voltage_default"
+friendly_name = "Dimming voltage default setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3027
+group = "status_registers"
+name = "load_current_min"
+friendly_name = "Load current min setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x3028
+group = "status_registers"
+name = "load_current_max"
+friendly_name = "Load current max setting value"
+function_codes = [0x04]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x3029
+group = "status_registers"
+name = "cvt_cvr_max_dropout_voltage"
+friendly_name = "Charge target and recovery voltage max allow dropout voltage for Li-series controller"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x302A
+group = "status_registers"
+name = "cvt_cvr_min_dropout_voltage"
+friendly_name = "Charge target and recovery voltage min allow dropout voltage for Li-series controller"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x302B
+group = "status_registers"
+name = "lvd_lvr_min_dropout_voltage"
+friendly_name = "Low voltage detect and recovery min allow dropout voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x302C
+group = "status_registers"
+name = "min_allow_dropout_voltage"
+friendly_name = "CVR and LVD & CVT and LVR Min allow dropout voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3030
+group = "status_registers"
+name = "equipment_id"
+friendly_name = "Equipment ID"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x3031
+group = "status_registers"
+name = "run_days"
+friendly_name = "Number of running days"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x3032
+group = "status_registers"
+name = "battery_voltage_level"
+friendly_name = "Current battery voltage level"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3033
+group = "status_registers"
+name = "battery_temperature_protection_status"
+friendly_name = "Battery temperature protection status"
+function_codes = [0x04]
+format = { kind = "enum", shift = 4, mask = 0x1, labels = ["Normal", "High temperature protection"] }
+
+[[register]]
+address = 0x3033
+group = "status_registers"
+name = "battery_voltage_protection_status"
+friendly_name = "Battery voltage protection status"
+function_codes = [0x04]
+format = { kind = "enum", shift = 0, mask = 0x3, labels = ["Normal", "Over voltage protection", "Voltage is low", "Low voltage protection"] }
+
+[[register]]
+address = 0x3034
+group = "status_registers"
+name = "solar_panel_charge_disabled"
+friendly_name = "Is charging manually disabled"
+function_codes = [0x04]
+format = { kind = "flag", shift = 6 }
+
+[[register]]
+address = 0x3034
+group = "status_registers"
+name = "solar_panel_is_night"
+friendly_name = "Is solar panel night"
+function_codes = [0x04]
+format = { kind = "flag", shift = 5 }
+
+[[register]]
+address = 0x3034
+group = "status_registers"
+name = "solar_panel_charge_over_temperature"
+friendly_name = "Is charge over temperature"
+function_codes = [0x04]
+format = { kind = "flag", shift = 4 }
+
+[[register]]
+address = 0x3034
+group = "status_registers"
+name = "solar_panel_charge_state"
+friendly_name = "Solar panel charge status"
+function_codes = [0x04]
+format = { kind = "enum", shift = 2, mask = 0x3, labels = ["Not charging", "Float charge", "Boost charge", "Equal charge"] }
+
+[[register]]
+address = 0x3034
+group = "status_registers"
+name = "solar_panel_charge_fault"
+friendly_name = "Is charge fault"
+function_codes = [0x04]
+format = { kind = "flag", shift = 1 }
+
+[[register]]
+address = 0x3034
+group = "status_registers"
+name = "solar_panel_is_charging"
+friendly_name = "Solar panel is charging"
+function_codes = [0x04]
+format = { kind = "flag", shift = 0 }
+
+[[register]]
+address = 0x3035
+group = "status_registers"
+name = "load_state"
+friendly_name = "Load status"
+function_codes = [0x04]
+format = { kind = "enum", shift = 12, mask = 0x3, labels = ["Light load", "Moderate load", "Rated load", "Overload"] }
+
+[[register]]
+address = 0x3035
+group = "status_registers"
+name = "output_short_circuit"
+friendly_name = "Is output short circuit"
+function_codes = [0x04]
+format = { kind = "flag", shift = 11 }
+
+[[register]]
+address = 0x3035
+group = "status_registers"
+name = "output_hardware_protection"
+friendly_name = "Is output hardware protection"
+function_codes = [0x04]
+format = { kind = "flag", shift = 4 }
+
+[[register]]
+address = 0x3035
+group = "status_registers"
+name = "output_open_circuit_protection"
+friendly_name = "Is output open circuit protection"
+function_codes = [0x04]
+format = { kind = "flag", shift = 3 }
+
+[[register]]
+address = 0x3035
+group = "status_registers"
+name = "output_over_temperature"
+friendly_name = "Is output over temperature"
+function_codes = [0x04]
+format = { kind = "flag", shift = 2 }
+
+[[register]]
+address = 0x3035
+group = "status_registers"
+name = "output_fault"
+friendly_name = "Is output fault"
+function_codes = [0x04]
+format = { kind = "flag", shift = 1 }
+
+[[register]]
+# Bit 0 is documented as "discharging", but it stays set in every frame with
+# no load connected and 0.00 A, so it is the load output switch, not a
+# discharge state. Do not rename it to match that wording.
+address = 0x3035
+group = "status_registers"
+name = "load_is_enabled"
+friendly_name = "Is load enabled"
+function_codes = [0x04]
+format = { kind = "flag", shift = 0 }
+
+[[register]]
+address = 0x3036
+group = "status_registers"
+name = "environment_temperature"
+friendly_name = "Environment temperature"
+function_codes = [0x04]
+format = { kind = "number", unit = "°C", divisor = 100 }
+
+[[register]]
+address = 0x3037
+group = "status_registers"
+name = "device_built_in_temperature"
+friendly_name = "Device built-intemperature"
+function_codes = [0x04]
+format = { kind = "number", unit = "°C", divisor = 100 }
+
+[[register]]
+address = 0x3038
+group = "status_registers"
+name = "battery_empty_times"
+friendly_name = "Battery empty times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x3039
+group = "status_registers"
+name = "battery_full_times"
+friendly_name = "Battery full times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x303A
+group = "status_registers"
+name = "over_voltage_protection_times"
+friendly_name = "Over-voltage protection times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x303B
+group = "status_registers"
+name = "over_current_protection_times"
+friendly_name = "Over-current protection times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x303C
+group = "status_registers"
+name = "short_circuit_protection_times"
+friendly_name = "short-circuit protection times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x303D
+group = "status_registers"
+name = "open_circuit_protection_times"
+friendly_name = "Open-circuit protection times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x303E
+group = "status_registers"
+name = "hardware_protection_times"
+friendly_name = "Hardware protection times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x303F
+group = "status_registers"
+name = "charge_over_temperature_protection_times"
+friendly_name = "Charge over-temperature protection times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x3040
+group = "status_registers"
+name = "discharge_over_temperature_protection_times"
+friendly_name = "Discharge over-temperature protection time"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x3045
+group = "status_registers"
+name = "battery_percentage"
+friendly_name = "Battery remaining capacity"
+function_codes = [0x04]
+format = { kind = "number", unit = "%" }
+
+[[register]]
+address = 0x3046
+group = "status_registers"
+name = "battery_voltage"
+friendly_name = "Battery voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3047
+group = "status_registers"
+name = "battery_current"
+friendly_name = "Battery current"
+function_codes = [0x04]
+is_signed = true
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x3048
+group = "status_registers"
+name = "battery_power"
+friendly_name = "Battery power"
+function_codes = [0x04]
+is_32_bit = true
+is_signed = true
+format = { kind = "number", unit = "W", divisor = 100 }
+
+[[register]]
+address = 0x304A
+group = "status_registers"
+name = "load_voltage"
+friendly_name = "Load voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x304B
+group = "status_registers"
+name = "load_current"
+friendly_name = "Load current"
+function_codes = [0x04]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x304C
+group = "status_registers"
+name = "load_power"
+friendly_name = "Load power"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "W", divisor = 100 }
+
+[[register]]
+address = 0x304E
+group = "status_registers"
+name = "solar_panel_voltage"
+friendly_name = "Solar panel voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x304F
+group = "status_registers"
+name = "solar_panel_current"
+friendly_name = "Solar panel current"
+function_codes = [0x04]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x3050
+group = "status_registers"
+name = "solar_panel_power"
+friendly_name = "Solar panel power"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "W", divisor = 100 }
+
+[[register]]
+address = 0x3052
+group = "status_registers"
+name = "solar_panel_daily_energy"
+friendly_name = "Daily solar panel energy"
+function_codes = [0x04]
+format = { kind = "number", unit = "kWh", divisor = 100 }
+
+[[register]]
+address = 0x3053
+group = "status_registers"
+name = "solar_panel_total_energy"
+friendly_name = "Total solar panel energy"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "kWh", divisor = 100 }
+
+[[register]]
+address = 0x3055
+group = "status_registers"
+name = "load_daily_energy"
+friendly_name = "Daily load energy"
+function_codes = [0x04]
+format = { kind = "number", unit = "kWh", divisor = 100 }
+
+[[register]]
+address = 0x3056
+group = "status_registers"
+name = "load_total_energy"
+friendly_name = "Total load energy"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "kWh", divisor = 100 }
+
+[[register]]
+address = 0x3058
+group = "status_registers"
+name = "total_light_time_during_the_day"
+friendly_name = "Total light time during the day"
+function_codes = [0x04]
+format = { kind = "number", unit = "min" }
+
+[[register]]
+address = 0x309D
+group = "status_registers"
+name = "run_days"
+friendly_name = "Number of running days"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x30A0
+group = "status_registers"
+name = "battery_voltage"
+friendly_name = "Battery voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x30A1
+group = "status_registers"
+name = "battery_current"
+friendly_name = "Battery current"
+function_codes = [0x04]
+is_signed = true
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x30A2
+group = "status_registers"
+name = "environment_temperature"
+friendly_name = "Environment temperature"
+function_codes = [0x04]
+format = { kind = "number", unit = "°C", divisor = 100 }
+
+[[register]]
+address = 0x30A3
+group = "status_registers"
+name = "battery_temperature_protection_status"
+friendly_name = "Battery temperature protection status"
+function_codes = [0x04]
+format = { kind = "enum", shift = 4, mask = 0x1, labels = ["Normal", "High temperature protection"] }
+
+[[register]]
+address = 0x30A3
+group = "status_registers"
+name = "battery_voltage_protection_status"
+friendly_name = "Battery voltage protection status"
+function_codes = [0x04]
+format = { kind = "enum", shift = 0, mask = 0x3, labels = ["Normal", "Over voltage protection", "Voltage is low", "Low voltage protection"] }
+
+[[register]]
+address = 0x30A4
+group = "status_registers"
+name = "solar_panel_charge_disabled"
+friendly_name = "Is charging manually disabled"
+function_codes = [0x04]
+format = { kind = "flag", shift = 6 }
+
+[[register]]
+address = 0x30A4
+group = "status_registers"
+name = "solar_panel_is_night"
+friendly_name = "Is solar panel night"
+function_codes = [0x04]
+format = { kind = "flag", shift = 5 }
+
+[[register]]
+address = 0x30A4
+group = "status_registers"
+name = "solar_panel_charge_over_temperature"
+friendly_name = "Is charge over temperature"
+function_codes = [0x04]
+format = { kind = "flag", shift = 4 }
+
+[[register]]
+address = 0x30A4
+group = "status_registers"
+name = "solar_panel_charge_state"
+friendly_name = "Solar panel charge status"
+function_codes = [0x04]
+format = { kind = "enum", shift = 2, mask = 0x3, labels = ["Not charging", "Float charge", "Boost charge", "Equal charge"] }
+
+[[register]]
+address = 0x30A4
+group = "status_registers"
+name = "solar_panel_charge_fault"
+friendly_name = "Is charge fault"
+function_codes = [0x04]
+format = { kind = "flag", shift = 1 }
+
+[[register]]
+address = 0x30A4
+group = "status_registers"
+name = "solar_panel_is_charging"
+friendly_name = "Solar panel is charging"
+function_codes = [0x04]
+format = { kind = "flag", shift = 0 }
+
+[[register]]
+address = 0x30A5
+group = "status_registers"
+name = "load_state"
+friendly_name = "Load status"
+function_codes = [0x04]
+format = { kind = "enum", shift = 12, mask = 0x3, labels = ["Light load", "Moderate load", "Rated load", "Overload"] }
+
+[[register]]
+address = 0x30A5
+group = "status_registers"
+name = "output_short_circuit"
+friendly_name = "Is output short circuit"
+function_codes = [0x04]
+format = { kind = "flag", shift = 11 }
+
+[[register]]
+address = 0x30A5
+group = "status_registers"
+name = "output_hardware_protection"
+friendly_name = "Is output hardware protection"
+function_codes = [0x04]
+format = { kind = "flag", shift = 4 }
+
+[[register]]
+address = 0x30A5
+group = "status_registers"
+name = "output_open_circuit_protection"
+friendly_name = "Is output open circuit protection"
+function_codes = [0x04]
+format = { kind = "flag", shift = 3 }
+
+[[register]]
+address = 0x30A5
+group = "status_registers"
+name = "output_over_temperature"
+friendly_name = "Is output over temperature"
+function_codes = [0x04]
+format = { kind = "flag", shift = 2 }
+
+[[register]]
+address = 0x30A5
+group = "status_registers"
+name = "output_fault"
+friendly_name = "Is output fault"
+function_codes = [0x04]
+format = { kind = "flag", shift = 1 }
+
+[[register]]
+address = 0x30A5
+group = "status_registers"
+name = "load_is_discharging"
+friendly_name = "Is load discharging"
+function_codes = [0x04]
+format = { kind = "flag", shift = 0 }
+
+[[register]]
+address = 0x30A6
+group = "status_registers"
+name = "battery_empty_times"
+friendly_name = "Battery empty times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x30A7
+group = "status_registers"
+name = "battery_full_times"
+friendly_name = "Battery full times"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x30A8
+group = "status_registers"
+name = "battery_daily_voltage_maximum"
+friendly_name = "Highest battery voltage today"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x30A9
+group = "status_registers"
+name = "battery_daily_voltage_minimum"
+friendly_name = "Lowest battery voltage today"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3125
+group = "status_registers"
+name = "load_voltage"
+friendly_name = "Load voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3126
+group = "status_registers"
+name = "load_current"
+friendly_name = "Load current"
+function_codes = [0x04]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x3127
+group = "status_registers"
+name = "load_power"
+friendly_name = "Load power"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "W", divisor = 100 }
+
+[[register]]
+address = 0x3129
+group = "status_registers"
+name = "load_daily_energy"
+friendly_name = "Daily load energy"
+function_codes = [0x04]
+format = { kind = "number", unit = "kWh", divisor = 100 }
+
+[[register]]
+address = 0x312E
+group = "status_registers"
+name = "load_total_energy"
+friendly_name = "Total load energy"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "kWh", divisor = 100 }
+
+[[register]]
+address = 0x316C
+group = "status_registers"
+name = "run_days"
+friendly_name = "The number of running days"
+function_codes = [0x04]
+format = { kind = "number" }
+
+[[register]]
+address = 0x3000
+group = "rated_parameters"
+name = "solar_panel_rated_voltage"
+friendly_name = "Solar panel rated voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3001
+group = "rated_parameters"
+name = "solar_panel_rated_current"
+friendly_name = "Solar panel rated current"
+function_codes = [0x04]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x3002
+group = "rated_parameters"
+name = "solar_panel_rated_power"
+friendly_name = "Solar panel rated power"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "W", divisor = 100 }
+
+[[register]]
+address = 0x3004
+group = "rated_parameters"
+name = "battery_rated_voltage"
+friendly_name = "Battery rated voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3005
+group = "rated_parameters"
+name = "battery_rated_current"
+friendly_name = "Battery rated current"
+function_codes = [0x04]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x3006
+group = "rated_parameters"
+name = "battery_rated_power"
+friendly_name = "Battery rated power"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "W", divisor = 100 }
+
+[[register]]
+address = 0x3008
+group = "rated_parameters"
+name = "load_rated_voltage"
+friendly_name = "Load rated voltage"
+function_codes = [0x04]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x3009
+group = "rated_parameters"
+name = "load_rated_current"
+friendly_name = "Load rated current"
+function_codes = [0x04]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x300A
+group = "rated_parameters"
+name = "load_rated_power"
+friendly_name = "Load rated power"
+function_codes = [0x04]
+is_32_bit = true
+format = { kind = "number", unit = "W", divisor = 100 }
+
+[[register]]
+address = 0x8FF0
+group = "read_only_registers"
+name = "maximum_system_voltage_level"
+friendly_name = "Maximum system voltage level"
+function_codes = [0x03]
+format = { kind = "enum", shift = 12, mask = 0xF, labels = ["", "12V", "24V", "36V", "48V"] }
+
+[[register]]
+address = 0x8FF0
+group = "read_only_registers"
+name = "minimum_system_voltage_level"
+friendly_name = "Minimum system voltage level"
+function_codes = [0x03]
+format = { kind = "enum", shift = 8, mask = 0xF, labels = ["", "12V", "24V", "36V", "48V"] }
+
+[[register]]
+address = 0x8FF0
+group = "read_only_registers"
+name = "controller_series"
+friendly_name = "Controller Series"
+function_codes = [0x03]
+format = { kind = "enum", shift = 4, mask = 0xF, labels = ["MT series", "DC series", "SMR series"] }
+
+[[register]]
+address = 0x8FF0
+group = "read_only_registers"
+name = "battery_type"
+friendly_name = "Battery type"
+function_codes = [0x03]
+format = { kind = "enum", shift = 0, mask = 0xF, labels = ["Lithium battery", "Non Lithium battery"] }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "infrared_function_available"
+friendly_name = "Is infrared function available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 15 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "automatic_power_reduction_available"
+friendly_name = "Is automatic power reduction setting available(only in 365 mode)"
+function_codes = [0x03]
+format = { kind = "flag", shift = 14 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "charging_at_zero_celsius_available"
+friendly_name = "Is 0°C prohibit charging setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 13 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "grade_of_rated_voltage_available"
+friendly_name = "Is grade of rated voltage setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 12 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "overcharge_recovery_voltage_available"
+friendly_name = "Is overcharge recovery voltage setting available (only lithium battery)"
+function_codes = [0x03]
+format = { kind = "flag", shift = 11 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "overcharge_protection_available"
+friendly_name = "Is overcharge protection setting available (only lithium battery)"
+function_codes = [0x03]
+format = { kind = "flag", shift = 10 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "floating_charge_voltage_available"
+friendly_name = "Is floating charge voltage setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 9 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "equilibrium_charge_voltage_available"
+friendly_name = "Is equilibrium charge voltage setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 8 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "strong_charging_voltage_available"
+friendly_name = "Is strong charging voltage setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 7 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "low_voltage_recovery_voltage_available"
+friendly_name = "Is low voltage recovery setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 6 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "low_voltage_protection_voltage_available"
+friendly_name = "Is low voltage protection setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 5 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "battery_type_available"
+friendly_name = "Is Battery Type setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 4 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "backlight_time_available"
+friendly_name = "Is Backlight Time setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 3 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "device_time_available"
+friendly_name = "Is Device Time setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 2 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "device_id_available"
+friendly_name = "Is Device ID setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 1 }
+
+[[register]]
+address = 0x8FF1
+group = "read_only_registers"
+name = "device_password_available"
+friendly_name = "Is Device password setting available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 0 }
+
+[[register]]
+address = 0x8FF2
+group = "read_only_registers"
+name = "six_time_frame_mode_available"
+friendly_name = "Is Six Time Frame Mode available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 7 }
+
+[[register]]
+address = 0x8FF2
+group = "read_only_registers"
+name = "five_time_frame_mode_available"
+friendly_name = "Is Five Time Frame Mode available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 6 }
+
+[[register]]
+address = 0x8FF2
+group = "read_only_registers"
+name = "timing_control_mode_available"
+friendly_name = "Is Timing Control available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 5 }
+
+[[register]]
+address = 0x8FF2
+group = "read_only_registers"
+name = "t0t_mode_available"
+friendly_name = "Is T0T Mode available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 4 }
+
+[[register]]
+address = 0x8FF2
+group = "read_only_registers"
+name = "fixed_duration_mode_available"
+friendly_name = "Is Fixed Light Up Duration Mode available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 3 }
+
+[[register]]
+address = 0x8FF2
+group = "read_only_registers"
+name = "d2d_mode_available"
+friendly_name = "Is D2D Mode available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 2 }
+
+[[register]]
+address = 0x8FF2
+group = "read_only_registers"
+name = "24h_mode_available"
+friendly_name = "Is 24H Mode available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 1 }
+
+[[register]]
+address = 0x8FF2
+group = "read_only_registers"
+name = "manual_operation_mode_available"
+friendly_name = "Is Manual Operation Mode available"
+function_codes = [0x03]
+format = { kind = "flag", shift = 0 }
+
+[[register]]
+address = 0x8FF4
+group = "read_only_registers"
+name = "lvd_min_setting_value"
+friendly_name = "Low voltage detect min setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FF5
+group = "read_only_registers"
+name = "lvd_max_setting_value"
+friendly_name = "Low voltage detect max setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FF6
+group = "read_only_registers"
+name = "lvd_default_setting_value"
+friendly_name = "Low voltage detect default setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FF7
+group = "read_only_registers"
+name = "lvr_min_setting_value"
+friendly_name = "Low voltage recovery min setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FF8
+group = "read_only_registers"
+name = "lvr_max_setting_value"
+friendly_name = "Low voltage recovery max setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FF9
+group = "read_only_registers"
+name = "lvr_default_setting_value"
+friendly_name = "Low voltage recovery default setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FFA
+group = "read_only_registers"
+name = "cvt_min_setting_value"
+friendly_name = "Charge target voltage min setting value for Li Series controller"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FFB
+group = "read_only_registers"
+name = "cvt_max_setting_value"
+friendly_name = "Charge target voltage max setting value Li Series controller"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FFC
+group = "read_only_registers"
+name = "cvt_default_setting_value"
+friendly_name = "Charge target voltage default setting value Li Series controller"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FFD
+group = "read_only_registers"
+name = "cvr_min_setting_value"
+friendly_name = "Charge recovery voltage min setting value Li Series controller"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FFE
+group = "read_only_registers"
+name = "cvr_max_setting_value"
+friendly_name = "Charge recovery voltage max setting value Li Series controller"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x8FFF
+group = "read_only_registers"
+name = "cvr_default_setting_value"
+friendly_name = "Charge recovery voltage default setting value Li Series controller"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9000
+group = "read_only_registers"
+name = "day_night_threshold_voltage_min"
+friendly_name = "Day/Night threshold voltage min setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9001
+group = "read_only_registers"
+name = "day_night_threshold_voltage_max"
+friendly_name = "Day/Night threshold voltage max setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9002
+group = "read_only_registers"
+name = "day_night_threshold_voltage_default"
+friendly_name = "Day/Night threshold voltage default setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9003
+group = "read_only_registers"
+name = "dimming_voltage_min"
+friendly_name = "Dimming voltage min setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9004
+group = "read_only_registers"
+name = "dimming_voltage_max"
+friendly_name = "Dimming voltage max setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9005
+group = "read_only_registers"
+name = "dimming_voltage_default"
+friendly_name = "Dimming voltage default setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9006
+group = "read_only_registers"
+name = "load_current_min"
+friendly_name = "Load current min setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x9007
+group = "read_only_registers"
+name = "load_current_max"
+friendly_name = "Load current max setting value"
+function_codes = [0x03]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x9008
+group = "read_only_registers"
+name = "battery_voltage_level"
+friendly_name = "Current battery voltage level"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9009
+group = "read_only_registers"
+name = "cvt_cvr_max_dropout_voltage"
+friendly_name = "Charge target and recovery voltage max allow dropout voltage for Li-series controller"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x900A
+group = "read_only_registers"
+name = "cvt_cvr_min_dropout_voltage"
+friendly_name = "Charge target and recovery voltage min allow dropout voltage for Li-series controller"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x900B
+group = "read_only_registers"
+name = "lvd_lvr_min_dropout_voltage"
+friendly_name = "Low voltage detect and recovery min allow dropout voltage"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x900C
+group = "read_only_registers"
+name = "min_allow_dropout_voltage"
+friendly_name = "CVR and LVD & CVT and LVR Min allow dropout voltage"
+function_codes = [0x03]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9017
+group = "device_parameters"
+name = "real_time_clock_second"
+friendly_name = "Real-time clock second"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "ss" }
+
+[[register]]
+address = 0x9018
+group = "device_parameters"
+name = "real_time_clock_minute"
+friendly_name = "Real-time clock minute"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "mm" }
+
+[[register]]
+address = 0x9019
+group = "device_parameters"
+name = "real_time_clock_hour"
+friendly_name = "Real-time clock hour"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "hh" }
+
+[[register]]
+address = 0x901A
+group = "device_parameters"
+name = "real_time_clock_day"
+friendly_name = "Real-time clock day"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "dd" }
+
+[[register]]
+address = 0x901B
+group = "device_parameters"
+name = "real_time_clock_month"
+friendly_name = "Real-time clock month"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "MM" }
+
+[[register]]
+address = 0x901C
+group = "device_parameters"
+name = "real_time_clock_year"
+friendly_name = "Real-time clock year (00-99)"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "yy" }
+
+[[register]]
+address = 0x901D
+group = "device_parameters"
+name = "baud_rate"
+friendly_name = "Baud rate"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", unit = "baud", shift = 0, mask = 0xF, labels = ["4800", "9600", "19200", "57600", "115200"] }
+
+[[register]]
+address = 0x901E
+group = "device_parameters"
+name = "backlight_time"
+friendly_name = "Backlight time"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "s" }
+
+[[register]]
+address = 0x901F
+group = "device_parameters"
+name = "device_password"
+friendly_name = "Device password"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "digits", digits = 4, clamp = 9 }
+
+[[register]]
+address = 0x9020
+group = "device_parameters"
+name = "slave_id"
+friendly_name = "Slave ID"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number" }
+
+[[register]]
+address = 0x9021
+group = "battery_and_load_parameters"
+name = "battery_type"
+friendly_name = "Battery type"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", shift = 0, mask = 0xF, labels = ["Lithium", "Liquid", "GEL", "AGM"] }
+
+[[register]]
+address = 0x9022
+group = "battery_and_load_parameters"
+name = "low_voltage_protection_voltage"
+friendly_name = "Low voltage protection"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9023
+group = "battery_and_load_parameters"
+name = "low_voltage_recovery_voltage"
+friendly_name = "Low voltage recovery"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9024
+group = "battery_and_load_parameters"
+name = "boost_voltage"
+friendly_name = "Boost voltage"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9025
+group = "battery_and_load_parameters"
+name = "equalizing_voltage"
+friendly_name = "Equalizing voltage"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9026
+group = "battery_and_load_parameters"
+name = "float_voltage"
+friendly_name = "Float voltage"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9027
+group = "battery_and_load_parameters"
+name = "system_rated_voltage_level"
+friendly_name = "System rated voltage level"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", shift = 0, mask = 0xF, labels = ["Auto", "12V", "24V", "36V", "48V", "60V", "110V", "120V", "220V", "240V"] }
+
+[[register]]
+address = 0x9028
+group = "battery_and_load_parameters"
+name = "charge_target_voltage_for_lithium"
+friendly_name = "Charge target voltage for lithium"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9029
+group = "battery_and_load_parameters"
+name = "charge_recovery_voltage_for_lithium"
+friendly_name = "Charge recovery voltage for lithium"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x902A
+group = "battery_and_load_parameters"
+name = "charging_at_zero_celsius"
+friendly_name = "0°C charging"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", shift = 0, mask = 0xF, labels = ["Normal charging", "No charging", "Slow charging"] }
+
+[[register]]
+address = 0x902B
+group = "battery_and_load_parameters"
+name = "mt_series_load_mode"
+friendly_name = "Load mode for MT series controller"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", shift = 0, mask = 0xF, labels = ["Always on", "Dusk to dawn", "Night light on time 2 hours", "Night light on time 3 hours", "Night light on time 4 hours", "Night light on time 5 hours", "Night light on time 6 hours", "Night light on time 7 hours", "Night light on time 8 hours", "Night light on time 9 hours", "Manual", "T0T", "Timing switch"] }
+
+[[register]]
+address = 0x902C
+group = "battery_and_load_parameters"
+name = "mt_series_manual_control_default"
+friendly_name = "MT Series manual control mode default setting"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["On", "Off"] }
+
+[[register]]
+address = 0x902D
+group = "battery_and_load_parameters"
+name = "mt_series_timing_period_1"
+friendly_name = "MT Series timing opening period 1"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "packed_time", unit = "min" }
+
+[[register]]
+address = 0x902E
+group = "battery_and_load_parameters"
+name = "mt_series_timing_period_2"
+friendly_name = "MT Series timing opening period 2"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "packed_time", unit = "min" }
+
+[[register]]
+address = 0x902F
+group = "battery_and_load_parameters"
+name = "timed_start_time_1_seconds"
+friendly_name = "Timed start time 1-seconds"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "sec" }
+
+[[register]]
+address = 0x9030
+group = "battery_and_load_parameters"
+name = "timed_start_time_1_minutes"
+friendly_name = "Timed start time 1-minute"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "min" }
+
+[[register]]
+address = 0x9031
+group = "battery_and_load_parameters"
+name = "timed_start_time_1_hours"
+friendly_name = "Timed start time 1-hour"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "hour" }
+
+[[register]]
+address = 0x9032
+group = "battery_and_load_parameters"
+name = "timed_off_time_1_seconds"
+friendly_name = "Timed off time 1-seconds"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "sec" }
+
+[[register]]
+address = 0x9033
+group = "battery_and_load_parameters"
+name = "timed_off_time_1_minutes"
+friendly_name = "Timed off time 1-minute"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "min" }
+
+[[register]]
+address = 0x9034
+group = "battery_and_load_parameters"
+name = "timed_off_time_1_hours"
+friendly_name = "Timed off time 1-hour"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "hour" }
+
+[[register]]
+address = 0x9035
+group = "battery_and_load_parameters"
+name = "timed_start_time_2_seconds"
+friendly_name = "Timed start time 2-seconds"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "sec" }
+
+[[register]]
+address = 0x9036
+group = "battery_and_load_parameters"
+name = "timed_start_time_2_minutes"
+friendly_name = "Timed start time 2-minute"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "min" }
+
+[[register]]
+address = 0x9037
+group = "battery_and_load_parameters"
+name = "timed_start_time_2_hours"
+friendly_name = "Timed start time 2-hour"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "hour" }
+
+[[register]]
+address = 0x9038
+group = "battery_and_load_parameters"
+name = "timed_off_time_2_seconds"
+friendly_name = "Timed off time 2-seconds"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "sec" }
+
+[[register]]
+address = 0x9039
+group = "battery_and_load_parameters"
+name = "timed_off_time_2_minutes"
+friendly_name = "Timed off time 2-minute"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "min" }
+
+[[register]]
+address = 0x903A
+group = "battery_and_load_parameters"
+name = "timed_off_time_2_hours"
+friendly_name = "Timed off time 2-hour"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "hour" }
+
+[[register]]
+address = 0x903B
+group = "battery_and_load_parameters"
+name = "time_control_period_selection"
+friendly_name = "Time control period selection"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["1 period", "2 periods"] }
+
+[[register]]
+address = 0x903C
+group = "battery_and_load_parameters"
+name = "light_controlled_dark_voltage"
+friendly_name = "Light controlled dark voltage"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x903D
+group = "battery_and_load_parameters"
+name = "day_night_delay_time"
+friendly_name = "Day/Night delay time"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "min" }
+
+[[register]]
+address = 0x903E
+group = "battery_and_load_parameters"
+name = "dc_series_timing_control_time_1_dimming"
+friendly_name = "DC series timing control time 1 dimming"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%", divisor = 0.1 }
+
+[[register]]
+address = 0x903F
+group = "battery_and_load_parameters"
+name = "dc_series_timing_control_time_2_dimming"
+friendly_name = "DC series timing control time 2 dimming"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%", divisor = 0.1 }
+
+[[register]]
+address = 0x9040
+group = "battery_and_load_parameters"
+name = "dc_series_time_1"
+friendly_name = "DC Series time 1"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "min", divisor = 0.03333333333333333 }
+
+[[register]]
+address = 0x9041
+group = "battery_and_load_parameters"
+name = "dc_series_time_1_dimming"
+friendly_name = "DC Series the time 1 dimming"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%", divisor = 0.1 }
+
+[[register]]
+address = 0x9042
+group = "battery_and_load_parameters"
+name = "dc_series_time_2"
+friendly_name = "DC Series time 2"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "min", divisor = 0.03333333333333333 }
+
+[[register]]
+address = 0x9043
+group = "battery_and_load_parameters"
+name = "dc_series_time_2_dimming"
+friendly_name = "DC Series the time 2 dimming"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%", divisor = 0.1 }
+
+[[register]]
+address = 0x9044
+group = "battery_and_load_parameters"
+name = "dc_series_time_3"
+friendly_name = "DC Series time 3"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "sec", divisor = 0.03333333333333333 }
+
+[[register]]
+address = 0x9045
+group = "battery_and_load_parameters"
+name = "dc_series_time_3_dimming"
+friendly_name = "DC Series the time 3 dimming"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%", divisor = 0.1 }
+
+[[register]]
+address = 0x9046
+group = "battery_and_load_parameters"
+name = "dc_series_time_4"
+friendly_name = "DC Series time 4"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "sec", divisor = 0.03333333333333333 }
+
+[[register]]
+address = 0x9047
+group = "battery_and_load_parameters"
+name = "dc_series_time_4_dimming"
+friendly_name = "DC Series the time 4 dimming"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%", divisor = 0.1 }
+
+[[register]]
+address = 0x9048
+group = "battery_and_load_parameters"
+name = "dc_series_time_5"
+friendly_name = "DC Series time 5"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "sec", divisor = 0.03333333333333333 }
+
+[[register]]
+address = 0x9049
+group = "battery_and_load_parameters"
+name = "dc_series_time_5_dimming"
+friendly_name = "DC Series the time 5 dimming"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%", divisor = 0.1 }
+
+[[register]]
+address = 0x904A
+group = "battery_and_load_parameters"
+name = "dc_series_load_current_limit"
+friendly_name = "DC Series load current limit"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x904B
+group = "battery_and_load_parameters"
+name = "dc_series_auto_dimming"
+friendly_name = "DC Series auto dimming"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", shift = 0, mask = 0xF, labels = ["Auto dimming", "365 mode", "No dimming", "No dimming"] }
+
+[[register]]
+address = 0x904C
+group = "battery_and_load_parameters"
+name = "dc_series_dimming_voltage"
+friendly_name = "DC Series dimming voltage"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x904D
+group = "battery_and_load_parameters"
+name = "dc_series_dimming_percentage"
+friendly_name = "DC Series dimming percentage"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%" }
+
+[[register]]
+address = 0x904E
+group = "battery_and_load_parameters"
+name = "sensing_delay_off_time"
+friendly_name = "Sensing delay off time"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "sec", divisor = 0.1 }
+
+[[register]]
+address = 0x904F
+group = "battery_and_load_parameters"
+name = "infrared_dimming_when_no_people"
+friendly_name = "Dimming of Infrared Series controller when no people"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%", divisor = 0.1 }
+
+[[register]]
+address = 0x9052
+group = "battery_and_load_parameters"
+name = "light_controlled_switch"
+friendly_name = "Light controlled switch"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["Off", "On"] }
+
+[[register]]
+address = 0x9053
+group = "battery_and_load_parameters"
+name = "light_controlled_daybreak_voltage"
+friendly_name = "Light-control led daybreak voltage"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "V", divisor = 100 }
+
+[[register]]
+address = 0x9054
+group = "battery_and_load_parameters"
+name = "dimming_percentage"
+friendly_name = "Dimming percentage for load test"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "%" }
+
+[[register]]
+address = 0x9069
+group = "battery_and_load_parameters"
+name = "maximum_charging_current_setting"
+friendly_name = "Maximum charging current setting"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "A", divisor = 100 }
+
+[[register]]
+address = 0x906A
+group = "battery_and_load_parameters"
+name = "over_temperature_protection"
+friendly_name = "Over temperature protection"
+function_codes = [0x03, 0x06, 0x10]
+format = { kind = "number", unit = "°C", divisor = 100 }
+
+[[register]]
+address = 0x0
+group = "switches"
+name = "manual_control_switch"
+friendly_name = "Manual control switch"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["Off", "On"] }
+
+[[register]]
+address = 0x1
+group = "switches"
+name = "test_key_trigger"
+friendly_name = "Test key on or off"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["Off", "On"] }
+
+[[register]]
+address = 0x2
+group = "switches"
+name = "dc_series_timing_control_mode_switch"
+friendly_name = "DC Series timing control mode switch"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["Off", "On"] }
+
+[[register]]
+address = 0x3
+group = "switches"
+name = "manual_control_charging_switch"
+friendly_name = "Manual control charging switch"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["Off", "On"] }
+
+[[register]]
+address = 0x8
+group = "switches"
+name = "restore_system_default_values"
+friendly_name = "Restore system default values"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["", "Restore"] }
+
+[[register]]
+address = 0x9
+group = "switches"
+name = "clear_device_statistics"
+friendly_name = "Clear running days, Power generation or consumption WH and historical minimum and maximum voltage"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["", "Clear"] }
+
+[[register]]
+address = 0xA
+group = "switches"
+name = "clear_counters"
+friendly_name = "Clear all protection and fully charged times"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["", "Clear"] }
+
+[[register]]
+address = 0xB
+group = "switches"
+name = "clear_charge_discharge_ah"
+friendly_name = "Clear charge and discharge AH"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["", "Clear"] }
+
+[[register]]
+address = 0xC
+group = "switches"
+name = "clear_all"
+friendly_name = "Clear all of the above historical data"
+function_codes = [0x05]
+format = { kind = "enum", shift = 0, mask = 0x1, labels = ["", "Clear"] }

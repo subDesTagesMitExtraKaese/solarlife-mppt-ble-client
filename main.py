@@ -7,11 +7,11 @@ import traceback
 
 import aiomqtt
 from bleak import BleakScanner
-from bleak.exc import BleakError, BleakDeviceNotFoundError
+from bleak.exc import BleakDeviceNotFoundError, BleakError
 
+from src.bleclient import BleClient
 from src.homeassistant import MqttSensor
-from src.bleclient import BleClient, Result
-from src.variables import variables, VariableContainer, battery_and_load_parameters, switches
+from src.registers import battery_and_load_parameters, switches
 
 request_interval = 20   # In seconds
 reconnect_interval = 5  # In seconds
@@ -28,15 +28,14 @@ async def request_and_publish_details(sensor: MqttSensor, address: str) -> None:
                     await sensor.publish(details)
                 else:
                     print("No values recieved")
-        except (BleakError, asyncio.TimeoutError) as e:
+        except (TimeoutError, BleakError) as e:
             print(f"Got {type(e).__name__} while fetching details: {e}")
 
 async def request_and_publish_parameters(sensor: MqttSensor, address: str) -> None:
-    async with ble_lock:
-        async with BleClient(address) as mppt:
-            parameters = await mppt.request_parameters()
-            if parameters:
-                await sensor.publish(parameters)
+    async with ble_lock, BleClient(address) as mppt:
+        parameters = await mppt.request_parameters()
+        if parameters:
+            await sensor.publish(parameters)
 
 async def subscribe_and_watch(sensor: MqttSensor, address: str):
     parameters = battery_and_load_parameters[:12] + switches
@@ -51,7 +50,7 @@ async def subscribe_and_watch(sensor: MqttSensor, address: str):
                 async with BleClient(address) as mppt:
                     results = await mppt.write([command])
                     await sensor.publish(results)
-            except (BleakError, asyncio.TimeoutError) as e:
+            except (TimeoutError, BleakError) as e:
                 print(f"Get {type(e).__name__} while writing command: {e}")
 
 
@@ -66,7 +65,7 @@ async def run_mppt(sensor: MqttSensor, address: str):
             await asyncio.sleep(request_interval)
             if task.done() and task.exception():
                 break
-    except (asyncio.TimeoutError, BleakDeviceNotFoundError, BleakError) as e:
+    except (TimeoutError, BleakDeviceNotFoundError, BleakError) as e:
         print(f"{type(e).__name__} occurred: {e}")
     finally:
         task.cancel()
@@ -90,7 +89,7 @@ async def run_mqtt(address, host, port, username, password):
             print(f'Error "{error}". Reconnecting in {reconnect_interval} seconds.')
         except asyncio.CancelledError:
             raise  # Re-raise the CancelledError to stop the task
-        except Exception as e:
+        except OSError:
             print(traceback.format_exc())
         await asyncio.sleep(reconnect_interval)
 
@@ -100,7 +99,7 @@ async def main(*args):
         task = loop.create_task(run_mqtt(*args))
 
         # Setup signal handler to cancel the task on termination
-        for signame in {'SIGINT', 'SIGTERM'}:
+        for signame in ('SIGINT', 'SIGTERM'):
             loop.add_signal_handler(getattr(signal, signame),
                                     task.cancel)
 
