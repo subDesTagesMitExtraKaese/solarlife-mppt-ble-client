@@ -204,6 +204,9 @@ void SolarlifeMppt::send_write_(const PendingWrite &write) {
   }
 
   this->in_flight_ = write;
+  // The controller echoes the write with the same function code, so the frame
+  // matcher has to expect that code instead of the last read's.
+  this->expected_fc_ = fc;
   this->state_ = State::WAIT_WRITE;
   this->retries_left_ = this->retries_;
   this->frame_length_ = 0;

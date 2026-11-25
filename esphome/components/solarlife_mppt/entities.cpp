@@ -147,6 +147,9 @@ void SolarlifeMpptSwitch::write_state(bool state) {
   if (this->register_ == nullptr)
     return;
   ESP_LOGD(TAG, "Writing %s=%s", this->register_name_.c_str(), ONOFF(state));
+  // Switch registers are write-only, so the controller never reports them.
+  // Publish the requested state and let on_write_failed() revert it.
+  this->publish_state(state);
   this->parent_->request_write(this->register_, state);
 }
 
